@@ -191,15 +191,23 @@ class PayoutController extends Controller
             type:               '1', // default to 1 for single payout
         );
 
-        $response = app(PayoutService::class)->createSinglePayout($payout_dto, $user);
-        if(!$response)
-        {
+        $serviceResponse = app(PayoutService::class)->createSinglePayout($payout_dto, $user);
+
+        if (!is_array($serviceResponse) || !array_key_exists('status', $serviceResponse)) {
             return $this->encryptedError($securityHelper, 'Failed to initiate payout. Please try again.', [], 500);
         }
 
-        $successResponse = $this->successResponse($response, 'Payout initiated successfully');
-        $successJsonString = $successResponse->getContent();
-        return $securityHelper->encrypt($successJsonString);
+        if (($serviceResponse['status'] ?? false) !== true) {
+            return $this->encryptedError(
+                $securityHelper,
+                (string) ($serviceResponse['message'] ?? 'Failed to initiate payout. Please try again.'),
+                (array) ($serviceResponse['data'] ?? []),
+                422
+            );
+        }
+
+        $successResponse = response()->json($serviceResponse, 200);
+        return $securityHelper->encrypt($successResponse->getContent());
     }
 
     /**
@@ -405,9 +413,22 @@ class PayoutController extends Controller
         ), $body_data['payouts']);
 
         try {
-            $transactionIds = app(PayoutService::class)->createBulkPayout($dtos, $user);
-            $success = $this->successResponse(['transaction_ids' => $transactionIds], 'Bulk payout initiated');
-            return $securityHelper->encrypt($success->getContent());
+            $serviceResponse = app(PayoutService::class)->createBulkPayout($dtos, $user);
+
+            if (!is_array($serviceResponse) || !array_key_exists('status', $serviceResponse)) {
+                return $this->encryptedError($securityHelper, 'Failed to initiate bulk payout. Please try again.', [], 500);
+            }
+
+            if (($serviceResponse['status'] ?? false) !== true) {
+                return $this->encryptedError(
+                    $securityHelper,
+                    (string) ($serviceResponse['message'] ?? 'Failed to initiate bulk payout. Please try again.'),
+                    (array) ($serviceResponse['data'] ?? []),
+                    422
+                );
+            }
+
+            return $securityHelper->encrypt(response()->json($serviceResponse, 200)->getContent());
         } catch (\Exception $e) {
             \Log::error('Bulk payout error: ' . $e->getMessage());
             return $this->encryptedError($securityHelper, 'Failed to initiate bulk payout. Please try again.', [], 500);

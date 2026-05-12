@@ -48,11 +48,11 @@ class PayoutService
             $bankId = config('sprintnxt-endpoints.bank_id');
 
             if ($acctNumber === '') {
-                throw new \Exception('Source account number is missing for balance check.');
+                return $this->errorResponse('Source account number is missing for balance check.');
             }
 
             if (blank($bankId)) {
-                throw new \Exception('SPRINTNXT bank id is not configured.');
+                return $this->errorResponse('Bank account id is not configured.');
             }
 
             $payload = [
@@ -73,7 +73,7 @@ class PayoutService
                 || ((int) ($response['responsecode'] ?? 0) === 1);
 
             if (!$isSuccess) {
-                throw new \Exception($response['message'] ?? 'Unable to fetch account balance from gateway.');
+                return $this->errorResponse($response['message'] ?? 'Unable to fetch account balance from gateway.');
             }
 
             $data = is_array($response['data'] ?? null) ? $response['data'] : [];
@@ -87,7 +87,7 @@ class PayoutService
             ];
         } catch (\Exception $e) {
             Log::error('PayoutService getAccountBalance error: ' . $e->getMessage());
-            throw $e;
+            return $this->errorResponse($e->getMessage());
         }
     }
 
@@ -289,7 +289,7 @@ class PayoutService
                 Cache::forget('sprintnxt_auth_token');
                 Log::warning("PayoutService createSinglePayout received auth error from gateway. Cleared cached token.");
 
-                throw new \Exception('Gateway authorization failed. Please retry payout.');
+                return $this->errorResponse('Gateway authorization failed. Please retry payout.');
             }
 
             if ($isSuccess && $txnStatus !== null) {
@@ -302,6 +302,8 @@ class PayoutService
                     'txn_status'       => $txnStatus,
                     'processed_at'     => now(),
                 ]);
+
+                return $this->successResponse('Payout initiated successfully', ['transaction_id' => $payoutRecord->transaction_id]);
             } else {
                 $payoutRecord->update([
                     'status'              => 'failed',
@@ -312,16 +314,16 @@ class PayoutService
                 // Refund wallet since API rejected the payout
                 $this->refundWallet($user, (float) $feeAndTotal['total_amount']);
 
-                throw new \Exception($response['message'] ?? 'Payout failed');
+                return $this->errorResponse($response['message'] ?? 'Payout failed');
             }
 
-            return $payoutRecord->transaction_id;
+            return $this->successResponse('Payout initiated successfully', ['transaction_id' => $payoutRecord->transaction_id]);
         } catch (\Exception $e) {
             \Log::error([
                 'message' => "Error in createSinglePayout: " . $e->getMessage(),
                 'payload' => isset($payload) ? json_encode($payload) : 'N/A',
             ]);
-            throw $e;
+            return $this->errorResponse('Something went wrong while processing the payout. Please try again.');
         } finally {
             if ($payoutRecord instanceof Payout) {
                 //$this->dispatchPayoutMailEvent($payoutRecord);
@@ -490,7 +492,7 @@ class PayoutService
             //     $this->dispatchPayoutMailEvent($record);
             // }
 
-            throw new \Exception($response['message'] ?? 'Bulk payout request failed');
+            return $this->errorResponse($response['message'] ?? 'Bulk payout request failed');
         }
 
         // ── 5. Update batch record with gateway response ─────────────────────
@@ -501,7 +503,7 @@ class PayoutService
             'tracker_id'      => $response['tracker_id'] ?? null,
         ]);
 
-        return $acceptedTxIds;
+        return $this->successResponse('Payouts processed successfully', ['accepted_tx_ids' => $acceptedTxIds]);
     }
 
     public function getPayoutStatusByTransactionId(string $transactionId): ?string
@@ -541,11 +543,18 @@ class PayoutService
                 $payout->update($updates);
             }
 
-            return $payout->fresh()->status;
+            return $this->successResponse('Payout status fetched successfully', ['status' => $payout->fresh()->status]);
 
         } catch (\Exception $e) {
             \Log::error("Error fetching payout status for transaction ID {$transactionId}: " . $e->getMessage());
-            return null;
+            \Log::error([
+                'message' => $e->getMessage(),
+                'transaction_id' => $transactionId,
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return $this->errorResponse('Something went wrong while fetching the payout status. Please try again.');
         }
     }
 
@@ -602,5 +611,23 @@ class PayoutService
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    public function successResponse($message, $data = []): array
+    {
+        return [
+            'status' => true,
+            'message' => $message,
+            'data' => $data,
+        ];
+    }
+
+    public function errorResponse($message, $data = []): array
+    {
+        return [
+            'status' => false,
+            'message' => $message,
+            'data' => $data,
+        ];
     }
 }
