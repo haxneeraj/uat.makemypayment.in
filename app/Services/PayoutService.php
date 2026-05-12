@@ -78,16 +78,21 @@ class PayoutService
 
             $data = is_array($response['data'] ?? null) ? $response['data'] : [];
 
-            return [
+            $data = [
                 'accountnumber'    => (string) ($data['accountnumber'] ?? $acctNumber),
                 'netBalance'       => (float) ($data['netBalance'] ?? 0),
                 'availableBalance' => (float) ($data['availableBalance'] ?? 0),
-                'message'          => (string) ($response['message'] ?? 'Balance fetched successfully.'),
                 'raw'              => $response,
             ];
+
+            return $this->successResponse($data['message'] ?? 'Balance fetched successfully.', $data);
         } catch (\Exception $e) {
-            Log::error('PayoutService getAccountBalance error: ' . $e->getMessage());
-            return $this->errorResponse($e->getMessage());
+            Log::error('PayoutService getAccountBalance error: ' . $e->getMessage(), [
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return $this->errorResponse('Something went wrong while fetching the account balance. Please try again.');
         }
     }
 
@@ -197,7 +202,7 @@ class PayoutService
      * Initiate a single payout via SprintNXT and persist the record.
      * Returns the local transaction_id on success.
      */
-    public function createSinglePayout(SinglePayoutDTO $payout, User $user): string
+    public function createSinglePayout(SinglePayoutDTO $payout, User $user): array
     {
         $payoutRecord = null;
 
@@ -506,7 +511,7 @@ class PayoutService
         return $this->successResponse('Payouts processed successfully', ['accepted_tx_ids' => $acceptedTxIds]);
     }
 
-    public function getPayoutStatusByTransactionId(string $transactionId): ?string
+    public function getPayoutStatusByTransactionId(string $transactionId): array
     {
         try {
             $payout = Payout::where('transaction_id', $transactionId)->first();
