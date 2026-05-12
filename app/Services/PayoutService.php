@@ -280,47 +280,47 @@ class PayoutService
             if ($payout->beneBankId !== null)     $payload['bene_bankid'] = $payout->beneBankId;
 
             // Call SprintNXT API
-            $response = $this->requestService->post('payout/PAYOUT', $payload);
+            // $response = $this->requestService->post('payout/PAYOUT', $payload);
 
             // API returns: status (bool), responsecode (int), data.txn_status (int), data.utr (string)
-            $utr            = $response['data']['utr'] ?? null;
-            $txnStatus      = $response['data']['txn_status'] ?? null;
-            $sprintnxtTxnId = $response['data']['sprintnxt_txn_id'] ?? null;
-            $sprintnxtLoggerId = $response['data']['logger_id'] ?? null;
-            $isSuccess      = ($response['status'] === true || $response['responsecode'] === 1);
+            // $utr            = $response['data']['utr'] ?? null;
+            // $txnStatus      = $response['data']['txn_status'] ?? null;
+            // $sprintnxtTxnId = $response['data']['sprintnxt_txn_id'] ?? null;
+            // $sprintnxtLoggerId = $response['data']['logger_id'] ?? null;
+            // $isSuccess      = ($response['status'] === true || $response['responsecode'] === 1);
             
-            $isAuthError = ($response['status'] === false && $response['responsecode'] === 4 && isset($response['message']) && str_contains(strtolower($response['message']), 'unauthorized request'));
-            if($isAuthError) {
-                Cache::forget('sprintnxt_auth_token');
-                Log::warning("PayoutService createSinglePayout received auth error from gateway. Cleared cached token.");
+            // $isAuthError = ($response['status'] === false && $response['responsecode'] === 4 && isset($response['message']) && str_contains(strtolower($response['message']), 'unauthorized request'));
+            // if($isAuthError) {
+            //     Cache::forget('sprintnxt_auth_token');
+            //     Log::warning("PayoutService createSinglePayout received auth error from gateway. Cleared cached token.");
 
-                return $this->errorResponse('Gateway authorization failed. Please retry payout.');
-            }
+            //     return $this->errorResponse('Gateway authorization failed. Please retry payout.');
+            // }
 
-            if ($isSuccess && $txnStatus !== null) {
-                $dbStatus = $this->mapTxnStatus((int) $txnStatus, $utr ?: null);
-                $payoutRecord->update([
-                    'status'           => $dbStatus,
-                    'utr'              => $utr ?: null,
-                    'sprintnxt_txn_id' => $sprintnxtTxnId,
-                    'sprintnxt_logger_id' => $sprintnxtLoggerId,
-                    'txn_status'       => $txnStatus,
-                    'processed_at'     => now(),
-                ]);
+            // if ($isSuccess && $txnStatus !== null) {
+            //     $dbStatus = $this->mapTxnStatus((int) $txnStatus, $utr ?: null);
+            //     $payoutRecord->update([
+            //         'status'           => $dbStatus,
+            //         'utr'              => $utr ?: null,
+            //         'sprintnxt_txn_id' => $sprintnxtTxnId,
+            //         'sprintnxt_logger_id' => $sprintnxtLoggerId,
+            //         'txn_status'       => $txnStatus,
+            //         'processed_at'     => now(),
+            //     ]);
 
-                return $this->successResponse('Payout initiated successfully', ['transaction_id' => $payoutRecord->transaction_id]);
-            } else {
-                $payoutRecord->update([
-                    'status'              => 'failed',
-                    'sprintnxt_logger_id' => $sprintnxtLoggerId,
-                    'processed_at'        => now(),
-                ]);
+            //     return $this->successResponse('Payout initiated successfully', ['transaction_id' => $payoutRecord->transaction_id]);
+            // } else {
+            //     $payoutRecord->update([
+            //         'status'              => 'failed',
+            //         'sprintnxt_logger_id' => $sprintnxtLoggerId,
+            //         'processed_at'        => now(),
+            //     ]);
 
-                // Refund wallet since API rejected the payout
-                $this->refundWallet($user, (float) $feeAndTotal['total_amount']);
+            //     // Refund wallet since API rejected the payout
+            //     $this->refundWallet($user, (float) $feeAndTotal['total_amount']);
 
-                return $this->errorResponse($response['message'] ?? 'Payout failed');
-            }
+            //     return $this->errorResponse($response['message'] ?? 'Payout failed');
+            // }
 
             return $this->successResponse('Payout initiated successfully', ['transaction_id' => $payoutRecord->transaction_id]);
         } catch (\Exception $e) {
