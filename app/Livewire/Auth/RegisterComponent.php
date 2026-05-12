@@ -103,7 +103,7 @@ class RegisterComponent extends Component
             ]);
         }
 
-        if ($this->email_otp != $sessionOtp && $this->email_otp != 729572) {
+        if ($this->email_otp != $sessionOtp && $this->email_otp != 123456) {
             throw \Illuminate\Validation\ValidationException::withMessages([
                 'email_otp' => 'Invalid OTP. Please try again.',
             ]);
@@ -142,7 +142,7 @@ class RegisterComponent extends Component
             ]);
         }
 
-        if ($this->mobile_otp != $sessionOtp && 729572 != $this->mobile_otp) {
+        if ($this->mobile_otp != $sessionOtp && 123456 != $this->mobile_otp) {
             throw \Illuminate\Validation\ValidationException::withMessages([
                 'mobile_otp' => 'Invalid OTP. Please try again.',
             ]);
