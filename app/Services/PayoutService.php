@@ -508,7 +508,7 @@ class PayoutService
         //     'tracker_id'      => $response['tracker_id'] ?? null,
         // ]);
 
-        return $this->successResponse('Payouts processed successfully', ['accepted_tx_ids' => []]);
+        return $this->successResponse('Payouts processed successfully', ['accepted_tx_ids' => '']);
     }
 
     public function getPayoutStatusByTransactionId(string $transactionId): array
