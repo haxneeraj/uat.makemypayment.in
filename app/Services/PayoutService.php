@@ -434,81 +434,81 @@ class PayoutService
 
         \Log::info('Initiating bulk payout batch_id=' . $batchId . ' count=' . count($transactions));
 
-        $response = $this->requestService->post('payout/PAYOUT', $payload);
+        // $response = $this->requestService->post('payout/PAYOUT', $payload);
 
-        $isSuccess = ($response['status'] === true || ($response['responsecode'] ?? '') === 'success');
+        // $isSuccess = ($response['status'] === true || ($response['responsecode'] ?? '') === 'success');
 
-        // ── 4. Process accepted / rejected from response ─────────────────────
-        $acceptedIds   = [];
-        $acceptedTxIds = [];
+        // // ── 4. Process accepted / rejected from response ─────────────────────
+        // $acceptedIds   = [];
+        // $acceptedTxIds = [];
 
-        if ($isSuccess) {
-            $accepted = $response['data']['transaction']['accept'] ?? [];
-            $rejected = $response['data']['transaction']['reject'] ?? [];
+        // if ($isSuccess) {
+        //     $accepted = $response['data']['transaction']['accept'] ?? [];
+        //     $rejected = $response['data']['transaction']['reject'] ?? [];
 
-            // Mark accepted payouts as 'initiated' (already set, but capture IDs)
-            foreach ($accepted as $item) {
-                $tid = (string) ($item['transferId'] ?? '');
-                if (isset($payoutMap[$tid])) {
-                    $acceptedIds[]   = $payoutMap[$tid]->id;
-                    $acceptedTxIds[] = $tid;
-                }
-            }
+        //     // Mark accepted payouts as 'initiated' (already set, but capture IDs)
+        //     foreach ($accepted as $item) {
+        //         $tid = (string) ($item['transferId'] ?? '');
+        //         if (isset($payoutMap[$tid])) {
+        //             $acceptedIds[]   = $payoutMap[$tid]->id;
+        //             $acceptedTxIds[] = $tid;
+        //         }
+        //     }
 
-            // Mark rejected payouts as 'failed' and refund their amounts
-            foreach ($rejected as $item) {
-                $tid = (string) ($item['transferId'] ?? '');
-                if (isset($payoutMap[$tid])) {
-                    $record = $payoutMap[$tid];
-                    $record->update([
-                        'status'       => 'failed',
-                        'processed_at' => now(),
-                    ]);
-                    // Refund total_amount (amount + fee) back to wallet
-                    $this->refundWallet($user, (float) $record->total_amount);
-                }
-            }
+        //     // Mark rejected payouts as 'failed' and refund their amounts
+        //     foreach ($rejected as $item) {
+        //         $tid = (string) ($item['transferId'] ?? '');
+        //         if (isset($payoutMap[$tid])) {
+        //             $record = $payoutMap[$tid];
+        //             $record->update([
+        //                 'status'       => 'failed',
+        //                 'processed_at' => now(),
+        //             ]);
+        //             // Refund total_amount (amount + fee) back to wallet
+        //             $this->refundWallet($user, (float) $record->total_amount);
+        //         }
+        //     }
 
-            // Any transferId not in accept or reject list — mark failed and refund
-            $knownIds = array_merge(
-                array_column($accepted, 'transferId'),
-                array_column($rejected, 'transferId'),
-            );
-            foreach ($payoutMap as $tid => $record) {
-                if (!in_array($tid, $knownIds, true)) {
-                    $record->update(['status' => 'failed', 'processed_at' => now()]);
-                    $this->refundWallet($user, (float) $record->total_amount);
-                }
-            }
+        //     // Any transferId not in accept or reject list — mark failed and refund
+        //     $knownIds = array_merge(
+        //         array_column($accepted, 'transferId'),
+        //         array_column($rejected, 'transferId'),
+        //     );
+        //     foreach ($payoutMap as $tid => $record) {
+        //         if (!in_array($tid, $knownIds, true)) {
+        //             $record->update(['status' => 'failed', 'processed_at' => now()]);
+        //             $this->refundWallet($user, (float) $record->total_amount);
+        //         }
+        //     }
 
-            // foreach ($payoutMap as $record) {
-            //     $this->dispatchPayoutMailEvent($record);
-            // }
-        } else {
-            // Whole batch was rejected — mark all as failed and refund entire batch debit
-            Payout::whereIn('id', array_map(fn($r) => $r->id, array_values($payoutMap)))
-                ->update(['status' => 'failed', 'processed_at' => now()]);
+        //     // foreach ($payoutMap as $record) {
+        //     //     $this->dispatchPayoutMailEvent($record);
+        //     // }
+        // } else {
+        //     // Whole batch was rejected — mark all as failed and refund entire batch debit
+        //     Payout::whereIn('id', array_map(fn($r) => $r->id, array_values($payoutMap)))
+        //         ->update(['status' => 'failed', 'processed_at' => now()]);
 
-            // Refund the total deducted amount for the entire batch
-            $totalRefund = array_sum(array_map(fn($r) => (float) $r->total_amount, array_values($payoutMap)));
-            $this->refundWallet($user, round($totalRefund, 2));
+        //     // Refund the total deducted amount for the entire batch
+        //     $totalRefund = array_sum(array_map(fn($r) => (float) $r->total_amount, array_values($payoutMap)));
+        //     $this->refundWallet($user, round($totalRefund, 2));
 
-            // foreach ($payoutMap as $record) {
-            //     $this->dispatchPayoutMailEvent($record);
-            // }
+        //     // foreach ($payoutMap as $record) {
+        //     //     $this->dispatchPayoutMailEvent($record);
+        //     // }
 
-            return $this->errorResponse($response['message'] ?? 'Bulk payout request failed');
-        }
+        //     return $this->errorResponse($response['message'] ?? 'Bulk payout request failed');
+        // }
 
-        // ── 5. Update batch record with gateway response ─────────────────────
-        $batch->update([
-            'system_batch_id' => $response['data']['bulk_system_batch_id'] ?? null,
-            'accepted_count'  => $response['data']['accepted'] ?? count($acceptedIds),
-            'rejected_count'  => $response['data']['rejected'] ?? (count($payoutMap) - count($acceptedIds)),
-            'tracker_id'      => $response['tracker_id'] ?? null,
-        ]);
+        // // ── 5. Update batch record with gateway response ─────────────────────
+        // $batch->update([
+        //     'system_batch_id' => $response['data']['bulk_system_batch_id'] ?? null,
+        //     'accepted_count'  => $response['data']['accepted'] ?? count($acceptedIds),
+        //     'rejected_count'  => $response['data']['rejected'] ?? (count($payoutMap) - count($acceptedIds)),
+        //     'tracker_id'      => $response['tracker_id'] ?? null,
+        // ]);
 
-        return $this->successResponse('Payouts processed successfully', ['accepted_tx_ids' => $acceptedTxIds]);
+        return $this->successResponse('Payouts processed successfully', ['accepted_tx_ids' => []]);
     }
 
     public function getPayoutStatusByTransactionId(string $transactionId): array
@@ -529,24 +529,24 @@ class PayoutService
 
             \Log::info("Status Payload: " . json_encode($payload));
 
-            $response = $this->requestService->post('payout/PAYOUT', $payload);
+            // $response = $this->requestService->post('payout/PAYOUT', $payload);
 
-            $isSuccess = ($response['status'] === true || $response['responsecode'] === 1);
+            // $isSuccess = ($response['status'] === true || $response['responsecode'] === 1);
            
 
-            if ($isSuccess && isset($response['data']['txn_status'])) {
-                $utr    = $response['data']['utr'] ?? null;
-                $status = $this->mapTxnStatus((int) $response['data']['txn_status'], $utr ?: null);
+            // if ($isSuccess && isset($response['data']['txn_status'])) {
+            //     $utr    = $response['data']['utr'] ?? null;
+            //     $status = $this->mapTxnStatus((int) $response['data']['txn_status'], $utr ?: null);
 
-                $updates = ['status' => $status];
-                if ($utr && !$payout->utr) {
-                    $updates['utr'] = $utr;
-                }
-                if (!$payout->processed_at && in_array($status, ['success', 'failed', 'processed'])) {
-                    $updates['processed_at'] = now();
-                }
-                $payout->update($updates);
-            }
+            //     $updates = ['status' => $status];
+            //     if ($utr && !$payout->utr) {
+            //         $updates['utr'] = $utr;
+            //     }
+            //     if (!$payout->processed_at && in_array($status, ['success', 'failed', 'processed'])) {
+            //         $updates['processed_at'] = now();
+            //     }
+            //     $payout->update($updates);
+            // }
 
             return $this->successResponse('Payout status fetched successfully', ['status' => $payout->fresh()->status]);
 
@@ -579,23 +579,23 @@ class PayoutService
                 'sprintnxtTxnId' => $sprintnxtTxnId,
             ];
 
-            $response = $this->requestService->post('payout/PAYOUT', $payload);
+            // $response = $this->requestService->post('payout/PAYOUT', $payload);
 
-            $isSuccess = ($response['status'] === true || $response['responsecode'] === 1);
+            // $isSuccess = ($response['status'] === true || $response['responsecode'] === 1);
 
-            if ($isSuccess && isset($response['data']['txn_status'])) {
-                $utr    = $response['data']['utr'] ?? null;
-                $status = $this->mapTxnStatus((int) $response['data']['txn_status'], $utr ?: null);
+            // if ($isSuccess && isset($response['data']['txn_status'])) {
+            //     $utr    = $response['data']['utr'] ?? null;
+            //     $status = $this->mapTxnStatus((int) $response['data']['txn_status'], $utr ?: null);
 
-                $updates = ['status' => $status];
-                if ($utr && !$payout->utr) {
-                    $updates['utr'] = $utr;
-                }
-                if (!$payout->processed_at && in_array($status, ['success', 'failed', 'processed'])) {
-                    $updates['processed_at'] = now();
-                }
-                $payout->update($updates);
-            }
+            //     $updates = ['status' => $status];
+            //     if ($utr && !$payout->utr) {
+            //         $updates['utr'] = $utr;
+            //     }
+            //     if (!$payout->processed_at && in_array($status, ['success', 'failed', 'processed'])) {
+            //         $updates['processed_at'] = now();
+            //     }
+            //     $payout->update($updates);
+            // }
 
             return $payout->fresh()->status;
 
