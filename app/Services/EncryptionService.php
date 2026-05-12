@@ -23,7 +23,7 @@ class EncryptionService
         );
 
         // Step 3: encrypt AES key with BANK public key
-        $bankPublicKey = file_get_contents(storage_path('app/paysprint_LIVE_publickey.pem'));
+        $bankPublicKey = file_get_contents(storage_path('app/paysprint_UAT_public-key.pem'));
 
         openssl_public_encrypt($key, $encryptedKey, $bankPublicKey);
 
@@ -39,7 +39,7 @@ class EncryptionService
     public static function decData(string $payload, string $encryptedKey): array
     {
         // Step 1: load your PRIVATE key
-        $privateKey = file_get_contents(storage_path('app/private-key-live-partner.key'));
+        $privateKey = file_get_contents(storage_path('app/partner_private.key'));
 
         if ($privateKey === false) {
             throw new RuntimeException('Failed to load live partner private key.');
