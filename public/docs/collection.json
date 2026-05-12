@@ -1,0 +1,315 @@
+{
+    "variable": [
+        {
+            "id": "baseUrl",
+            "key": "baseUrl",
+            "type": "string",
+            "name": "string",
+            "value": "https:\/\/api-uat.makemypayment.in"
+        }
+    ],
+    "info": {
+        "name": "Make My Payment API Documentation",
+        "_postman_id": "15c5e473-f308-4906-ab0e-326d684430af",
+        "description": "",
+        "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
+    },
+    "item": [
+        {
+            "name": "Account",
+            "description": "",
+            "item": [
+                {
+                    "name": "Get account balance.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/balance",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/balance"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-API-SECRET",
+                                "value": "string required Your API secret for encryption and authentication."
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Retrieve the current balance of the authenticated merchant's virtual account.\n\n**Note:**\n- Response will be AES encrypted using the merchant's API secret.\n- API key and secret must be sent in request headers for authentication.\n- Merchant pre-validation is enforced before request processing.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"status\": true,\n  \"message\": \"Account balance retrieved successfully\",\n  \"data\": {\n    \"balance\": 15000.50\n  },\n  \"errors\": null\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 400,
+                            "body": "{\n  \"status\": false,\n  \"message\": \"API key and secret are required\",\n  \"data\": null,\n  \"errors\": []\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\n  \"status\": false,\n  \"message\": \"Invalid API key or secret\",\n  \"data\": null,\n  \"errors\": []\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\n  \"status\": false,\n  \"message\": \"Merchant virtual account is not verified.\",\n  \"data\": null,\n  \"errors\": []\n}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Payouts",
+            "description": "",
+            "item": [
+                {
+                    "name": "Initiate a payout.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/payouts\/initiate",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/payouts\/initiate"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "X-API-SECRET",
+                                "value": "string required Your API secret for decryption and authentication."
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"account_holder\":\"John Doe\",\"account_number\":\"1234567890\",\"ifsc_code\":\"HDFC0001234\",\"bank_name\":\"HDFC Bank\",\"branch_name\":\"architecto\",\"branch_code\":\"architecto\",\"mobile\":\"9876543210\",\"city\":\"architecto\",\"beneficiary_address\":\"architecto\",\"amount\":\"500\",\"mode\":\"neft\",\"purpose\":\"architecto\",\"email\":\"user@example.com\",\"state\":\"bngzmi\",\"pincode\":\"569775\",\"remarks\":\"architecto\",\"narration\":\"architecto\"}"
+                        },
+                        "description": "Start a new payout transaction for the authenticated merchant.\n\n**Note:** The request body must be:\n - AES encrypted (AES\/CBC\/PKCS5Padding)\n - Base64 encoded after encryption\n - Raw JSON payload before encryption should include: account_holder, account_number, bank_name, ifsc_code, amount, email, mobile\n - Merchant pre-validation is enforced before request processing:\n   API key\/secret, merchant status=active, kyc_status=verified,\n   van_status=verified, verified IP\/webhook configuration.\n\n**Outbound Webhook (Status Notification):**\n\nWhen the payout status changes (e.g., `processing`, `success`, `failed`), the system will\nautomatically POST an **AES-256-CBC encrypted, Base64-encoded** payload to your registered webhook URL.\n\nThe raw JSON payload before encryption contains:\n```json\n{\n  \"transaction_id\": \"TXN987654321\",\n  \"beneficiary_account_holder\": \"John Doe\",\n  \"beneficiary_account_number\": \"1234567890\",\n  \"beneficiary_bank_name\": \"HDFC Bank\",\n  \"beneficiary_ifsc_code\": \"HDFC0001234\",\n  \"amount\": 500,\n  \"status\": \"success\",\n  \"utr\": \"UTR1234567890\",\n  \"remarks\": \"Payment for services\",\n  \"narration\": \"Salary\"\n}\n```\n\nThe encrypted string is sent as the raw POST body with headers:\n- `Content-Type: application\/json`\n- `x-signature: <your_webhook_secret>`\n\n**Your webhook endpoint MUST respond with HTTP 200** to acknowledge receipt.\nAny other response code is treated as failure and the system will retry up to 5 times\n(at 1 min, 5 min, and 15 min intervals).\n\nTo decrypt the webhook payload, use AES-256-CBC with your `api_secret` as the key\nand the fixed IV `0g7H#8X2mTqjvLwR`, then Base64-decode the body first.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"status\": true,\n  \"message\": \"Payout initiated successfully\",\n  \"data\": \"TXN987654321\",\n  \"errors\": null\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 400,
+                            "body": "{\n  \"status\": false,\n  \"message\": \"API key and secret are required\",\n  \"data\": null,\n  \"errors\": []\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 400,
+                            "body": "{\n  \"status\": false,\n  \"message\": \"Request body is not valid base64 encoded\",\n  \"data\": null,\n  \"errors\": []\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 400,
+                            "body": "{\n  \"status\": false,\n  \"message\": \"Failed to decrypt data\",\n  \"data\": null,\n  \"errors\": []\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 400,
+                            "body": "{\n  \"status\": false,\n  \"message\": \"Invalid JSON format after decryption\",\n  \"data\": null,\n  \"errors\": []\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\n  \"status\": false,\n  \"message\": \"Invalid API key or secret\",\n  \"data\": null,\n  \"errors\": []\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\n  \"status\": false,\n  \"message\": \"Merchant KYC is not verified.\",\n  \"data\": null,\n  \"errors\": []\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\n  \"status\": false,\n  \"message\": \"Validation failed\",\n  \"data\": null,\n  \"errors\": {\n    \"account_number\": [\"The account number field is required.\"],\n    \"amount\": [\"The amount must be at least merchant min transfer limit.\"]\n  }\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 500,
+                            "body": "{\n  \"status\": false,\n  \"message\": \"Failed to initiate payout. Please try again.\",\n  \"data\": null,\n  \"errors\": []\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Initiate bulk payouts.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/payouts\/bulk",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/payouts\/bulk"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "X-API-SECRET",
+                                "value": "string required"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"payouts\":[\"architecto\"]}"
+                        },
+                        "description": "Accepts an array of payout objects, persists each as 'initiated',\nand dispatches async jobs to process them via SprintNXT.\n\n**Note:** AES encrypted request \/ response same as initiate payout.\nMerchant pre-validation is enforced before request processing.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"status\": true,\n  \"message\": \"Bulk payout initiated\",\n  \"data\": {\"transaction_ids\": [\"ABCDEF1234567890\"]},\n  \"errors\": null\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\n  \"status\": false,\n  \"message\": \"Merchant API activation is not verified.\",\n  \"data\": null,\n  \"errors\": []\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Check payout status.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/payouts\/status",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/payouts\/status",
+                            "variable": [
+                                {
+                                    "id": "transaction_id",
+                                    "key": "transaction_id",
+                                    "value": "TXN123456",
+                                    "description": "The transaction ID of the payout."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-API-SECRET",
+                                "value": "string required Your API secret for encryption and authentication."
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"transaction_id\":\"b\"}"
+                        },
+                        "description": "Get the status of a specific payout transaction for the authenticated merchant.\n\n**Note:**\n- Response will be AES encrypted using the merchant's API secret.\n- API key and secret must be sent in request headers for authentication.\n- Merchant pre-validation is enforced before request processing.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"status\": true,\n  \"message\": \"Payout status retrieved successfully\",\n  \"data\": {\n    \"transaction_id\": \"TXN123456\",\n    \"beneficiary\": {\n      \"account_holder\": \"John Doe\",\n      \"account_number\": \"1234567890\",\n      \"bank_name\": \"HDFC Bank\",\n      \"ifsc_code\": \"HDFC0001234\"\n    },\n    \"amount\": \"1000.00\",\n    \"status\": \"success\",\n    \"utr\": \"UTR123456789\",\n    \"remarks\": \"Payment processed successfully\"\n  },\n  \"errors\": null\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 400,
+                            "body": "{\n  \"status\": false,\n  \"message\": \"API key and secret are required\",\n  \"data\": null,\n  \"errors\": []\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\n  \"status\": false,\n  \"message\": \"Invalid API key or secret\",\n  \"data\": null,\n  \"errors\": []\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\n  \"status\": false,\n  \"message\": \"Request IP is not whitelisted for this merchant.\",\n  \"data\": null,\n  \"errors\": []\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\n  \"status\": false,\n  \"message\": \"Payout not found\",\n  \"data\": null,\n  \"errors\": []\n}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "auth": {
+        "type": "apikey",
+        "apikey": [
+            {
+                "key": "in",
+                "value": "header",
+                "type": "string"
+            },
+            {
+                "key": "key",
+                "value": "X-API-KEY",
+                "type": "string"
+            }
+        ]
+    }
+}

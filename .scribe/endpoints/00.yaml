@@ -1,0 +1,92 @@
+name: Account
+description: ''
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/balance
+    metadata:
+      custom: []
+      groupName: Account
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get account balance.'
+      description: |-
+        Retrieve the current balance of the authenticated merchant's virtual account.
+
+        **Note:**
+        - Response will be AES encrypted using the merchant's API secret.
+        - API key and secret must be sent in request headers for authentication.
+        - Merchant pre-validation is enforced before request processing.
+      authenticated: false
+      deprecated: false
+    headers:
+      X-API-KEY: 'string required Your API key for authentication.'
+      X-API-SECRET: 'string required Your API secret for encryption and authentication.'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "status": true,
+            "message": "Account balance retrieved successfully",
+            "data": {
+              "balance": 15000.50
+            },
+            "errors": null
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 400
+        content: |-
+          {
+            "status": false,
+            "message": "API key and secret are required",
+            "data": null,
+            "errors": []
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: |-
+          {
+            "status": false,
+            "message": "Invalid API key or secret",
+            "data": null,
+            "errors": []
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: |-
+          {
+            "status": false,
+            "message": "Merchant virtual account is not verified.",
+            "data": null,
+            "errors": []
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null

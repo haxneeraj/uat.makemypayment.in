@@ -1,0 +1,2015 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Make My Payment API Documentation</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/theme-default.style.css" media="screen">
+    <link rel="stylesheet" href="css/theme-default.print.css" media="print">
+
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.10/lodash.min.js"></script>
+
+    <link rel="stylesheet"
+          href="https://unpkg.com/@highlightjs/cdn-assets@11.6.0/styles/obsidian.min.css">
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jets/0.14.1/jets.min.js"></script>
+
+    <style id="language-style">
+        /* starts out as display none and is replaced with js later  */
+                    body .content .bash-example code { display: none; }
+                    body .content .javascript-example code { display: none; }
+                    body .content .php-example code { display: none; }
+                    body .content .python-example code { display: none; }
+            </style>
+
+    <script>
+        var tryItOutBaseUrl = "https://api-uat.makemypayment.in";
+        var useCsrf = Boolean();
+        var csrfUrl = "/sanctum/csrf-cookie";
+    </script>
+    <script src="js/tryitout-5.9.0.js"></script>
+
+    <script src="js/theme-default-5.9.0.js"></script>
+
+</head>
+
+<body data-languages="[&quot;bash&quot;,&quot;javascript&quot;,&quot;php&quot;,&quot;python&quot;]">
+
+<a href="#" id="nav-button">
+    <span>
+        MENU
+        <img src="images/navbar.png" alt="navbar-image"/>
+    </span>
+</a>
+<div class="tocify-wrapper">
+            <img src="https://makemypayment.in/makemypayment-logo-white.svg" alt="logo" class="logo" style="padding-top: 10px;" width="100%"/>
+    
+            <div class="lang-selector">
+                                            <button type="button" class="lang-button" data-language-name="bash">bash</button>
+                                            <button type="button" class="lang-button" data-language-name="javascript">javascript</button>
+                                            <button type="button" class="lang-button" data-language-name="php">php</button>
+                                            <button type="button" class="lang-button" data-language-name="python">python</button>
+                    </div>
+    
+    <div class="search">
+        <input type="text" class="search" id="input-search" placeholder="Search">
+    </div>
+
+    <div id="toc">
+                    <ul id="tocify-header-introduction" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="introduction">
+                    <a href="#introduction">Introduction</a>
+                </li>
+                            </ul>
+                    <ul id="tocify-header-getting-started-with-your-api" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="getting-started-with-your-api">
+                    <a href="#getting-started-with-your-api">Getting Started With Your API</a>
+                </li>
+                                    <ul id="tocify-subheader-getting-started-with-your-api" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="api-base-url">
+                                <a href="#api-base-url">API Base URL</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="key-features">
+                                <a href="#key-features">Key Features</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="authentication">
+                                <a href="#authentication">🔐 Authentication</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="encryption">
+                                <a href="#encryption">🔒 Encryption</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="tip-for-developers">
+                                <a href="#tip-for-developers">💡 Tip for Developers</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
+                    <ul id="tocify-header-webhook-integration-guide" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="webhook-integration-guide">
+                    <a href="#webhook-integration-guide">Webhook Integration Guide</a>
+                </li>
+                                    <ul id="tocify-subheader-webhook-integration-guide" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="how-it-works">
+                                <a href="#how-it-works">How It Works</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="incoming-request-format">
+                                <a href="#incoming-request-format">Incoming Request Format</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="decrypting-the-payload">
+                                <a href="#decrypting-the-payload">Decrypting the Payload</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="verifying-the-request-recommended">
+                                <a href="#verifying-the-request-recommended">Verifying the Request (Recommended)</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="implementation-examples">
+                                <a href="#implementation-examples">Implementation Examples</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
+                    <ul id="tocify-header-authenticating-requests" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="authenticating-requests">
+                    <a href="#authenticating-requests">Authenticating requests</a>
+                </li>
+                            </ul>
+                    <ul id="tocify-header-account" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="account">
+                    <a href="#account">Account</a>
+                </li>
+                                    <ul id="tocify-subheader-account" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="account-GETapi-v1-balance">
+                                <a href="#account-GETapi-v1-balance">Get account balance.</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
+                    <ul id="tocify-header-payouts" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="payouts">
+                    <a href="#payouts">Payouts</a>
+                </li>
+                                    <ul id="tocify-subheader-payouts" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="payouts-POSTapi-v1-payouts-initiate">
+                                <a href="#payouts-POSTapi-v1-payouts-initiate">Initiate a payout.</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="payouts-POSTapi-v1-payouts-bulk">
+                                <a href="#payouts-POSTapi-v1-payouts-bulk">Initiate bulk payouts.</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="payouts-GETapi-v1-payouts-status">
+                                <a href="#payouts-GETapi-v1-payouts-status">Check payout status.</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
+            </div>
+
+    <ul class="toc-footer" id="last-updated">
+        <li>Last updated: May 10, 2026</li>
+    </ul>
+</div>
+
+<div class="page-wrapper">
+    <div class="dark-box"></div>
+    <div class="content">
+        <h1 id="introduction">Introduction</h1>
+<aside>
+    <strong>Base URL</strong>: <code>https://api-uat.makemypayment.in</code>
+</aside>
+<h1 id="getting-started-with-your-api">Getting Started With Your API</h1>
+<p>This guide helps you get started with the Payment System API integration.</p>
+<h2 id="api-base-url">API Base URL</h2>
+<p>We provide separate base URLs for two environments:</p>
+<ul>
+<li>
+<p><strong>UAT (Testing)</strong>: <a href="https://api-uat.makemypayment.in">https://api-uat.makemypayment.in</a><br />
+Use this environment to test your API calls, integrations, and development workflow.</p>
+</li>
+<li>
+<p><strong>Production</strong>: <a href="https://api.makemypayment.in">https://api.makemypayment.in</a><br />
+Use this environment to interact with live data in production.</p>
+</li>
+</ul>
+<blockquote>
+<p><strong>Recommended Steps:</strong></p>
+<ol>
+<li>Start with the <strong>UAT</strong> base URL to explore the API and test requests.  </li>
+<li>Once your integration works as expected, switch to the <strong>Production</strong> base URL.</li>
+</ol>
+</blockquote>
+<h2 id="key-features">Key Features</h2>
+<ul>
+<li>✅ <strong>Initiate Payout</strong> – Initiate a payout for your account.</li>
+<li>🔎 <strong>Check Payout Status</strong> – Track the status of any payout in real time.</li>
+<li>💰 <strong>Retrieve Account Balances</strong> – Get your current available balance instantly.</li>
+</ul>
+<h2 id="authentication">🔐 Authentication</h2>
+<p>All endpoints require <strong>authentication</strong> using two credentials:</p>
+<ul>
+<li><code>X-API-KEY</code> – Your unique API key.</li>
+<li><code>X-API-SECRET</code> – Used with <strong>AES encryption</strong> for secure request signing.</li>
+</ul>
+<p>Every payout and balance request is validated in this order:</p>
+<ol>
+<li>API key and secret match a merchant account.</li>
+<li>Merchant status must be <code>active</code>.</li>
+<li><code>kyc_status</code> and <code>van_status</code> must be <code>verified</code>.</li>
+<li>Merchant callback/IP activation must be <code>verified</code>, with webhook URL/secret set.</li>
+<li>Caller IP must match the merchant's whitelisted IP.</li>
+</ol>
+<blockquote>
+<p>If any validation fails, the API returns an error response in the same response envelope format.</p>
+</blockquote>
+<h2 id="encryption">🔒 Encryption</h2>
+<p>All sensitive request data is encrypted using <strong>AES-256-CBC</strong>.  </p>
+<ul>
+<li><strong>Algorithm:</strong> AES-256-CBC  </li>
+<li><strong>Default IV:</strong> <code>0g7H#8X2mTqjvLwR</code></li>
+</ul>
+<p>Ensure your client application implements the <strong>same encryption and decryption logic</strong> before sending the payload. The API expects the payload to be <strong>base64 encoded</strong> after encryption.</p>
+<p>Example workflow:</p>
+<ol>
+<li>Prepare your request data as JSON.</li>
+<li>Encrypt using AES-256-CBC with your <code>api_secret</code> and the default IV.</li>
+<li>Base64 encode the encrypted string.</li>
+<li>Send it in the request body or as defined by the endpoint.</li>
+</ol>
+<h2 id="tip-for-developers">💡 Tip for Developers</h2>
+<p>Use the provided code examples (on the right in desktop view or below on mobile) to quickly test requests in your preferred programming language.<br />
+Following the examples ensures correct headers, encryption, and payload structure.</p>
+<hr />
+<h1 id="webhook-integration-guide">Webhook Integration Guide</h1>
+<p>When a payout status changes (e.g., <code>processing</code> → <code>success</code> or <code>failed</code>), the system automatically sends a <strong>POST request</strong> to your registered <strong>Webhook URL</strong>.<br />
+You must implement this endpoint on your server to receive real-time payout status updates.</p>
+<h2 id="how-it-works">How It Works</h2>
+<ol>
+<li>You register a <strong>Webhook URL</strong> and a <strong>Webhook Secret</strong> during IP/callback activation.</li>
+<li>When a payout status changes, the system encrypts the payload and POSTs it to your URL.</li>
+<li>Your endpoint must <strong>respond with HTTP 200</strong> to acknowledge receipt.</li>
+<li>If your server does not return <code>200</code>, the system will <strong>retry up to 5 times</strong> at the following intervals:<ul>
+<li>1 minute, 5 minutes, 15 minutes (×3 remaining retries)</li>
+</ul>
+</li>
+</ol>
+<h2 id="incoming-request-format">Incoming Request Format</h2>
+<p>Your webhook URL will receive a <strong>POST</strong> request with:</p>
+<table>
+<thead>
+<tr>
+<th>Header</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Content-Type</code></td>
+<td><code>application/json</code></td>
+</tr>
+<tr>
+<td><code>x-signature</code></td>
+<td>Your registered Webhook Secret</td>
+</tr>
+</tbody>
+</table>
+<p>The <strong>raw request body</strong> is an <strong>AES-256-CBC encrypted, Base64-encoded string</strong> — not a JSON object.</p>
+<h2 id="decrypting-the-payload">Decrypting the Payload</h2>
+<p>To read the webhook data, decrypt the raw body using:</p>
+<ul>
+<li><strong>Algorithm:</strong> AES-256-CBC</li>
+<li><strong>Key:</strong> Your <code>api_secret</code> (the same secret used to sign API requests)</li>
+<li><strong>IV:</strong> <code>0g7H#8X2mTqjvLwR</code> (fixed)</li>
+<li><strong>Step 1:</strong> Base64-decode the raw body</li>
+<li><strong>Step 2:</strong> Decrypt using AES-256-CBC</li>
+</ul>
+<p>After decryption, you get a JSON string with the following fields:</p>
+<pre><code class="language-json">{
+  "transaction_id": "TXN987654321",
+  "beneficiary_account_holder": "John Doe",
+  "beneficiary_account_number": "1234567890",
+  "beneficiary_bank_name": "HDFC Bank",
+  "beneficiary_ifsc_code": "HDFC0001234",
+  "amount": 500,
+  "status": "success",
+  "utr": "UTR1234567890",
+  "remarks": "Payment for services",
+  "narration": "Salary"
+}</code></pre>
+<h3 id="payload-field-reference">Payload Field Reference</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>transaction_id</code></td>
+<td>string</td>
+<td>Your unique payout transaction ID</td>
+</tr>
+<tr>
+<td><code>beneficiary_account_holder</code></td>
+<td>string</td>
+<td>Beneficiary's full name</td>
+</tr>
+<tr>
+<td><code>beneficiary_account_number</code></td>
+<td>string</td>
+<td>Beneficiary's bank account number</td>
+</tr>
+<tr>
+<td><code>beneficiary_bank_name</code></td>
+<td>string</td>
+<td>Beneficiary's bank name</td>
+</tr>
+<tr>
+<td><code>beneficiary_ifsc_code</code></td>
+<td>string</td>
+<td>Beneficiary's bank IFSC code</td>
+</tr>
+<tr>
+<td><code>amount</code></td>
+<td>number</td>
+<td>Payout amount in INR</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>string</td>
+<td>Current payout status: <code>pending</code>, <code>processing</code>, <code>success</code>, <code>failed</code></td>
+</tr>
+<tr>
+<td><code>utr</code></td>
+<td>string|null</td>
+<td>UTR number (available on success)</td>
+</tr>
+<tr>
+<td><code>remarks</code></td>
+<td>string|null</td>
+<td>Remarks for the payout</td>
+</tr>
+<tr>
+<td><code>narration</code></td>
+<td>string|null</td>
+<td>Narration for the transaction</td>
+</tr>
+</tbody>
+</table>
+<h2 id="verifying-the-request-recommended">Verifying the Request (Recommended)</h2>
+<p>Before processing, verify that the request is genuinely from our system by checking the <code>x-signature</code> header against your registered Webhook Secret.</p>
+<h2 id="implementation-examples">Implementation Examples</h2>
+<h3 id="php">PHP</h3>
+<pre><code class="language-php">&lt;?php
+
+// Webhook endpoint: POST https://your-domain.com/webhook/payout
+
+$api_secret  = 'YOUR_API_SECRET';   // same as your api_secret
+$webhook_secret = 'YOUR_WEBHOOK_SECRET';
+$iv = '0g7H#8X2mTqjvLwR';
+
+// 1. Verify signature
+$signature = $_SERVER['HTTP_X_SIGNATURE'] ?? '';
+if ($signature !== $webhook_secret) {
+    http_response_code(401);
+    exit('Unauthorized');
+}
+
+// 2. Read and decrypt body
+$raw_body  = file_get_contents('php://input');
+$decrypted = openssl_decrypt(
+    base64_decode($raw_body),
+    'AES-256-CBC',
+    $api_secret,
+    OPENSSL_RAW_DATA,
+    $iv
+);
+
+$payload = json_decode($decrypted, true);
+
+// 3. Process the payload
+$transaction_id = $payload['transaction_id'];
+$status         = $payload['status'];
+$utr            = $payload['utr'] ?? null;
+
+// ... update your database, notify user, etc.
+
+// 4. MUST return HTTP 200
+http_response_code(200);
+echo json_encode(['received' =&gt; true]);</code></pre>
+<h3 id="nodejs-express">Node.js (Express)</h3>
+<pre><code class="language-javascript">const express = require('express');
+const crypto  = require('crypto');
+const app     = express();
+
+const API_SECRET     = 'YOUR_API_SECRET';
+const WEBHOOK_SECRET = 'YOUR_WEBHOOK_SECRET';
+const IV             = '0g7H#8X2mTqjvLwR';
+
+app.post('/webhook/payout', express.text({ type: '*/*' }), (req, res) =&gt; {
+  // 1. Verify signature
+  if (req.headers['x-signature'] !== WEBHOOK_SECRET) {
+    return res.status(401).send('Unauthorized');
+  }
+
+  // 2. Decrypt body
+  const decipher = crypto.createDecipheriv(
+    'aes-256-cbc',
+    Buffer.from(API_SECRET),
+    Buffer.from(IV)
+  );
+  let decrypted = decipher.update(Buffer.from(req.body, 'base64'));
+  decrypted = Buffer.concat([decrypted, decipher.final()]);
+  const payload = JSON.parse(decrypted.toString());
+
+  // 3. Process
+  console.log('Payout update:', payload.transaction_id, payload.status);
+
+  // 4. MUST return HTTP 200
+  res.status(200).json({ received: true });
+});</code></pre>
+<blockquote>
+<p>⚠️ <strong>Important:</strong> Your webhook endpoint <strong>must return HTTP 200</strong> within the timeout window.<br />
+Any other status code (including 201, 204, 4xx, 5xx) will be treated as a failure and trigger a retry.</p>
+</blockquote>
+
+        <h1 id="authenticating-requests">Authenticating requests</h1>
+<p>To authenticate requests, include a <strong><code>X-API-KEY</code></strong> header with the value <strong><code>"{YOUR_API_KEY}"</code></strong>.</p>
+<p>All authenticated endpoints are marked with a <code>requires authentication</code> badge in the documentation below.</p>
+<p>Also send <code>X-API-SECRET</code> in headers for decryption/encryption and merchant validation.</p>
+
+        <h1 id="account">Account</h1>
+
+    
+
+                                <h2 id="account-GETapi-v1-balance">Get account balance.</h2>
+
+<p>
+</p>
+
+<p>Retrieve the current balance of the authenticated merchant's virtual account.</p>
+<p><strong>Note:</strong></p>
+<ul>
+<li>Response will be AES encrypted using the merchant's API secret.</li>
+<li>API key and secret must be sent in request headers for authentication.</li>
+<li>Merchant pre-validation is enforced before request processing.</li>
+</ul>
+
+<span id="example-requests-GETapi-v1-balance">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "https://api-uat.makemypayment.in/api/v1/balance" \
+    --header "X-API-KEY: string required Your API key for authentication." \
+    --header "X-API-SECRET: string required Your API secret for encryption and authentication." \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "https://api-uat.makemypayment.in/api/v1/balance"
+);
+
+const headers = {
+    "X-API-KEY": "string required Your API key for authentication.",
+    "X-API-SECRET": "string required Your API secret for encryption and authentication.",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'https://api-uat.makemypayment.in/api/v1/balance';
+$response = $client-&gt;get(
+    $url,
+    [
+        'headers' =&gt; [
+            'X-API-KEY' =&gt; 'string required Your API key for authentication.',
+            'X-API-SECRET' =&gt; 'string required Your API secret for encryption and authentication.',
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'https://api-uat.makemypayment.in/api/v1/balance'
+headers = {
+  'X-API-KEY': 'string required Your API key for authentication.',
+  'X-API-SECRET': 'string required Your API secret for encryption and authentication.',
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('GET', url, headers=headers)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-balance">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: true,
+    &quot;message&quot;: &quot;Account balance retrieved successfully&quot;,
+    &quot;data&quot;: {
+        &quot;balance&quot;: 15000.5
+    },
+    &quot;errors&quot;: null
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (400):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: false,
+    &quot;message&quot;: &quot;API key and secret are required&quot;,
+    &quot;data&quot;: null,
+    &quot;errors&quot;: []
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: false,
+    &quot;message&quot;: &quot;Invalid API key or secret&quot;,
+    &quot;data&quot;: null,
+    &quot;errors&quot;: []
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: false,
+    &quot;message&quot;: &quot;Merchant virtual account is not verified.&quot;,
+    &quot;data&quot;: null,
+    &quot;errors&quot;: []
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-balance" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-balance"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-balance"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-balance" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-balance">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-balance" data-method="GET"
+      data-path="api/v1/balance"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-balance', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-balance"
+                    onclick="tryItOut('GETapi-v1-balance');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-balance"
+                    onclick="cancelTryOut('GETapi-v1-balance');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-balance"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/balance</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>X-API-KEY</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="X-API-KEY"                data-endpoint="GETapi-v1-balance"
+               value="string required Your API key for authentication."
+               data-component="header">
+    <br>
+<p>Example: <code>string required Your API key for authentication.</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>X-API-SECRET</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="X-API-SECRET"                data-endpoint="GETapi-v1-balance"
+               value="string required Your API secret for encryption and authentication."
+               data-component="header">
+    <br>
+<p>Example: <code>string required Your API secret for encryption and authentication.</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-balance"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-balance"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
+
+                <h1 id="payouts">Payouts</h1>
+
+    
+
+                                <h2 id="payouts-POSTapi-v1-payouts-initiate">Initiate a payout.</h2>
+
+<p>
+</p>
+
+<p>Start a new payout transaction for the authenticated merchant.</p>
+<p><strong>Note:</strong> The request body must be:</p>
+<ul>
+<li>AES encrypted (AES/CBC/PKCS5Padding)</li>
+<li>Base64 encoded after encryption</li>
+<li>Raw JSON payload before encryption should include: account_holder, account_number, bank_name, ifsc_code, amount, email, mobile</li>
+<li>Merchant pre-validation is enforced before request processing:
+API key/secret, merchant status=active, kyc_status=verified,
+van_status=verified, verified IP/webhook configuration.</li>
+</ul>
+<p><strong>Outbound Webhook (Status Notification):</strong></p>
+<p>When the payout status changes (e.g., <code>processing</code>, <code>success</code>, <code>failed</code>), the system will
+automatically POST an <strong>AES-256-CBC encrypted, Base64-encoded</strong> payload to your registered webhook URL.</p>
+<p>The raw JSON payload before encryption contains:</p>
+<pre><code class="language-json">{
+  "transaction_id": "TXN987654321",
+  "beneficiary_account_holder": "John Doe",
+  "beneficiary_account_number": "1234567890",
+  "beneficiary_bank_name": "HDFC Bank",
+  "beneficiary_ifsc_code": "HDFC0001234",
+  "amount": 500,
+  "status": "success",
+  "utr": "UTR1234567890",
+  "remarks": "Payment for services",
+  "narration": "Salary"
+}</code></pre>
+<p>The encrypted string is sent as the raw POST body with headers:</p>
+<ul>
+<li><code>Content-Type: application/json</code></li>
+<li><code>x-signature: &lt;your_webhook_secret&gt;</code></li>
+</ul>
+<p><strong>Your webhook endpoint MUST respond with HTTP 200</strong> to acknowledge receipt.
+Any other response code is treated as failure and the system will retry up to 5 times
+(at 1 min, 5 min, and 15 min intervals).</p>
+<p>To decrypt the webhook payload, use AES-256-CBC with your <code>api_secret</code> as the key
+and the fixed IV <code>0g7H#8X2mTqjvLwR</code>, then Base64-decode the body first.</p>
+
+<span id="example-requests-POSTapi-v1-payouts-initiate">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "https://api-uat.makemypayment.in/api/v1/payouts/initiate" \
+    --header "X-API-KEY: string required Your API key for authentication." \
+    --header "X-API-SECRET: string required Your API secret for decryption and authentication." \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"account_holder\": \"John Doe\",
+    \"account_number\": \"1234567890\",
+    \"ifsc_code\": \"HDFC0001234\",
+    \"bank_name\": \"HDFC Bank\",
+    \"branch_name\": \"architecto\",
+    \"branch_code\": \"architecto\",
+    \"mobile\": \"9876543210\",
+    \"city\": \"architecto\",
+    \"beneficiary_address\": \"architecto\",
+    \"amount\": \"500\",
+    \"mode\": \"neft\",
+    \"purpose\": \"architecto\",
+    \"email\": \"user@example.com\",
+    \"state\": \"bngzmi\",
+    \"pincode\": \"569775\",
+    \"remarks\": \"architecto\",
+    \"narration\": \"architecto\"
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "https://api-uat.makemypayment.in/api/v1/payouts/initiate"
+);
+
+const headers = {
+    "X-API-KEY": "string required Your API key for authentication.",
+    "X-API-SECRET": "string required Your API secret for decryption and authentication.",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "account_holder": "John Doe",
+    "account_number": "1234567890",
+    "ifsc_code": "HDFC0001234",
+    "bank_name": "HDFC Bank",
+    "branch_name": "architecto",
+    "branch_code": "architecto",
+    "mobile": "9876543210",
+    "city": "architecto",
+    "beneficiary_address": "architecto",
+    "amount": "500",
+    "mode": "neft",
+    "purpose": "architecto",
+    "email": "user@example.com",
+    "state": "bngzmi",
+    "pincode": "569775",
+    "remarks": "architecto",
+    "narration": "architecto"
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'https://api-uat.makemypayment.in/api/v1/payouts/initiate';
+$response = $client-&gt;post(
+    $url,
+    [
+        'headers' =&gt; [
+            'X-API-KEY' =&gt; 'string required Your API key for authentication.',
+            'X-API-SECRET' =&gt; 'string required Your API secret for decryption and authentication.',
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+        'json' =&gt; [
+            'account_holder' =&gt; 'John Doe',
+            'account_number' =&gt; '1234567890',
+            'ifsc_code' =&gt; 'HDFC0001234',
+            'bank_name' =&gt; 'HDFC Bank',
+            'branch_name' =&gt; 'architecto',
+            'branch_code' =&gt; 'architecto',
+            'mobile' =&gt; '9876543210',
+            'city' =&gt; 'architecto',
+            'beneficiary_address' =&gt; 'architecto',
+            'amount' =&gt; '500',
+            'mode' =&gt; 'neft',
+            'purpose' =&gt; 'architecto',
+            'email' =&gt; 'user@example.com',
+            'state' =&gt; 'bngzmi',
+            'pincode' =&gt; '569775',
+            'remarks' =&gt; 'architecto',
+            'narration' =&gt; 'architecto',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'https://api-uat.makemypayment.in/api/v1/payouts/initiate'
+payload = {
+    "account_holder": "John Doe",
+    "account_number": "1234567890",
+    "ifsc_code": "HDFC0001234",
+    "bank_name": "HDFC Bank",
+    "branch_name": "architecto",
+    "branch_code": "architecto",
+    "mobile": "9876543210",
+    "city": "architecto",
+    "beneficiary_address": "architecto",
+    "amount": "500",
+    "mode": "neft",
+    "purpose": "architecto",
+    "email": "user@example.com",
+    "state": "bngzmi",
+    "pincode": "569775",
+    "remarks": "architecto",
+    "narration": "architecto"
+}
+headers = {
+  'X-API-KEY': 'string required Your API key for authentication.',
+  'X-API-SECRET': 'string required Your API secret for decryption and authentication.',
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('POST', url, headers=headers, json=payload)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-v1-payouts-initiate">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: true,
+    &quot;message&quot;: &quot;Payout initiated successfully&quot;,
+    &quot;data&quot;: &quot;TXN987654321&quot;,
+    &quot;errors&quot;: null
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (400):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: false,
+    &quot;message&quot;: &quot;API key and secret are required&quot;,
+    &quot;data&quot;: null,
+    &quot;errors&quot;: []
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (400):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: false,
+    &quot;message&quot;: &quot;Request body is not valid base64 encoded&quot;,
+    &quot;data&quot;: null,
+    &quot;errors&quot;: []
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (400):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: false,
+    &quot;message&quot;: &quot;Failed to decrypt data&quot;,
+    &quot;data&quot;: null,
+    &quot;errors&quot;: []
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (400):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: false,
+    &quot;message&quot;: &quot;Invalid JSON format after decryption&quot;,
+    &quot;data&quot;: null,
+    &quot;errors&quot;: []
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: false,
+    &quot;message&quot;: &quot;Invalid API key or secret&quot;,
+    &quot;data&quot;: null,
+    &quot;errors&quot;: []
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: false,
+    &quot;message&quot;: &quot;Merchant KYC is not verified.&quot;,
+    &quot;data&quot;: null,
+    &quot;errors&quot;: []
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: false,
+    &quot;message&quot;: &quot;Validation failed&quot;,
+    &quot;data&quot;: null,
+    &quot;errors&quot;: {
+        &quot;account_number&quot;: [
+            &quot;The account number field is required.&quot;
+        ],
+        &quot;amount&quot;: [
+            &quot;The amount must be at least merchant min transfer limit.&quot;
+        ]
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (500):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: false,
+    &quot;message&quot;: &quot;Failed to initiate payout. Please try again.&quot;,
+    &quot;data&quot;: null,
+    &quot;errors&quot;: []
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-v1-payouts-initiate" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-v1-payouts-initiate"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-v1-payouts-initiate"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-v1-payouts-initiate" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-v1-payouts-initiate">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-v1-payouts-initiate" data-method="POST"
+      data-path="api/v1/payouts/initiate"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-payouts-initiate', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-v1-payouts-initiate"
+                    onclick="tryItOut('POSTapi-v1-payouts-initiate');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-v1-payouts-initiate"
+                    onclick="cancelTryOut('POSTapi-v1-payouts-initiate');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-v1-payouts-initiate"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/v1/payouts/initiate</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>X-API-KEY</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="X-API-KEY"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="string required Your API key for authentication."
+               data-component="header">
+    <br>
+<p>Example: <code>string required Your API key for authentication.</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>X-API-SECRET</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="X-API-SECRET"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="string required Your API secret for decryption and authentication."
+               data-component="header">
+    <br>
+<p>Example: <code>string required Your API secret for decryption and authentication.</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>account_holder</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="account_holder"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="John Doe"
+               data-component="body">
+    <br>
+<p>The full name of the bank account holder. Example: <code>John Doe</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>account_number</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="account_number"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="1234567890"
+               data-component="body">
+    <br>
+<p>The bank account number. Example: <code>1234567890</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>ifsc_code</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="ifsc_code"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="HDFC0001234"
+               data-component="body">
+    <br>
+<p>The IFSC code of the bank branch. Example: <code>HDFC0001234</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>bank_name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="bank_name"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="HDFC Bank"
+               data-component="body">
+    <br>
+<p>The name of the bank. Example: <code>HDFC Bank</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>branch_name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="branch_name"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>branch_code</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="branch_code"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>mobile</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="mobile"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="9876543210"
+               data-component="body">
+    <br>
+<p>The mobile number of the beneficiary (10 digits). Example: <code>9876543210</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>city</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="city"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>beneficiary_address</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="beneficiary_address"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>amount</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="amount"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="500"
+               data-component="body">
+    <br>
+<p>The payout amount (must be at least 100). Example: <code>500</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>mode</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="mode"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="neft"
+               data-component="body">
+    <br>
+<p>Example: <code>neft</code></p>
+Must be one of:
+<ul style="list-style-type: square;"><li><code>imps</code></li> <li><code>neft</code></li> <li><code>rtgs</code></li> <li><code>a2a</code></li></ul>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>purpose</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="purpose"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="email"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="user@example.com"
+               data-component="body">
+    <br>
+<p>The email address of the beneficiary. Example: <code>user@example.com</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>state</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="state"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="bngzmi"
+               data-component="body">
+    <br>
+<p>Must contain only letters. Example: <code>bngzmi</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>pincode</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="pincode"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="569775"
+               data-component="body">
+    <br>
+<p>Must be 6 digits. Example: <code>569775</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>remarks</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="remarks"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>narration</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="narration"                data-endpoint="POSTapi-v1-payouts-initiate"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+        </div>
+        </form>
+
+                    <h2 id="payouts-POSTapi-v1-payouts-bulk">Initiate bulk payouts.</h2>
+
+<p>
+</p>
+
+<p>Accepts an array of payout objects, persists each as 'initiated',
+and dispatches async jobs to process them via SprintNXT.</p>
+<p><strong>Note:</strong> AES encrypted request / response same as initiate payout.
+Merchant pre-validation is enforced before request processing.</p>
+
+<span id="example-requests-POSTapi-v1-payouts-bulk">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "https://api-uat.makemypayment.in/api/v1/payouts/bulk" \
+    --header "X-API-KEY: string required" \
+    --header "X-API-SECRET: string required" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"payouts\": [
+        \"architecto\"
+    ]
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "https://api-uat.makemypayment.in/api/v1/payouts/bulk"
+);
+
+const headers = {
+    "X-API-KEY": "string required",
+    "X-API-SECRET": "string required",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "payouts": [
+        "architecto"
+    ]
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'https://api-uat.makemypayment.in/api/v1/payouts/bulk';
+$response = $client-&gt;post(
+    $url,
+    [
+        'headers' =&gt; [
+            'X-API-KEY' =&gt; 'string required',
+            'X-API-SECRET' =&gt; 'string required',
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+        'json' =&gt; [
+            'payouts' =&gt; [
+                'architecto',
+            ],
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'https://api-uat.makemypayment.in/api/v1/payouts/bulk'
+payload = {
+    "payouts": [
+        "architecto"
+    ]
+}
+headers = {
+  'X-API-KEY': 'string required',
+  'X-API-SECRET': 'string required',
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('POST', url, headers=headers, json=payload)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-v1-payouts-bulk">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: true,
+    &quot;message&quot;: &quot;Bulk payout initiated&quot;,
+    &quot;data&quot;: {
+        &quot;transaction_ids&quot;: [
+            &quot;ABCDEF1234567890&quot;
+        ]
+    },
+    &quot;errors&quot;: null
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: false,
+    &quot;message&quot;: &quot;Merchant API activation is not verified.&quot;,
+    &quot;data&quot;: null,
+    &quot;errors&quot;: []
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-v1-payouts-bulk" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-v1-payouts-bulk"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-v1-payouts-bulk"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-v1-payouts-bulk" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-v1-payouts-bulk">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-v1-payouts-bulk" data-method="POST"
+      data-path="api/v1/payouts/bulk"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-payouts-bulk', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-v1-payouts-bulk"
+                    onclick="tryItOut('POSTapi-v1-payouts-bulk');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-v1-payouts-bulk"
+                    onclick="cancelTryOut('POSTapi-v1-payouts-bulk');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-v1-payouts-bulk"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/v1/payouts/bulk</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>X-API-KEY</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="X-API-KEY"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="string required"
+               data-component="header">
+    <br>
+<p>Example: <code>string required</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>X-API-SECRET</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="X-API-SECRET"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="string required"
+               data-component="header">
+    <br>
+<p>Example: <code>string required</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+        <details>
+            <summary style="padding-bottom: 10px;">
+                <b style="line-height: 2;"><code>payouts</code></b>&nbsp;&nbsp;
+<small>string[]</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>Array of payout objects. Each item has the same fields as initiate payout.</p>
+            </summary>
+                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>account_holder</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payouts.0.account_holder"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="b"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>b</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>account_number</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payouts.0.account_number"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>ifsc_code</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payouts.0.ifsc_code"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>bank_name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payouts.0.bank_name"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>branch_name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payouts.0.branch_name"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>branch_code</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payouts.0.branch_code"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>mobile</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payouts.0.mobile"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="8225697751"
+               data-component="body">
+    <br>
+<p>Must be 10 digits. Example: <code>8225697751</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>city</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payouts.0.city"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>beneficiary_address</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payouts.0.beneficiary_address"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>amount</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payouts.0.amount"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value=""
+               data-component="body">
+    <br>
+
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>mode</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payouts.0.mode"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="neft"
+               data-component="body">
+    <br>
+<p>Example: <code>neft</code></p>
+Must be one of:
+<ul style="list-style-type: square;"><li><code>imps</code></li> <li><code>neft</code></li> <li><code>rtgs</code></li> <li><code>a2a</code></li></ul>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>purpose</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payouts.0.purpose"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payouts.0.email"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="zbailey@example.net"
+               data-component="body">
+    <br>
+<p>Must be a valid email address. Example: <code>zbailey@example.net</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>state</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payouts.0.state"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="bngzmi"
+               data-component="body">
+    <br>
+<p>Must contain only letters. Example: <code>bngzmi</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>pincode</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payouts.0.pincode"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="569775"
+               data-component="body">
+    <br>
+<p>Must be 6 digits. Example: <code>569775</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>remarks</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payouts.0.remarks"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>narration</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payouts.0.narration"                data-endpoint="POSTapi-v1-payouts-bulk"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+                    </div>
+                                    </details>
+        </div>
+        </form>
+
+                    <h2 id="payouts-GETapi-v1-payouts-status">Check payout status.</h2>
+
+<p>
+</p>
+
+<p>Get the status of a specific payout transaction for the authenticated merchant.</p>
+<p><strong>Note:</strong></p>
+<ul>
+<li>Response will be AES encrypted using the merchant's API secret.</li>
+<li>API key and secret must be sent in request headers for authentication.</li>
+<li>Merchant pre-validation is enforced before request processing.</li>
+</ul>
+
+<span id="example-requests-GETapi-v1-payouts-status">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "https://api-uat.makemypayment.in/api/v1/payouts/status" \
+    --header "X-API-KEY: string required Your API key for authentication." \
+    --header "X-API-SECRET: string required Your API secret for encryption and authentication." \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"transaction_id\": \"b\"
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "https://api-uat.makemypayment.in/api/v1/payouts/status"
+);
+
+const headers = {
+    "X-API-KEY": "string required Your API key for authentication.",
+    "X-API-SECRET": "string required Your API secret for encryption and authentication.",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "transaction_id": "b"
+};
+
+fetch(url, {
+    method: "GET",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'https://api-uat.makemypayment.in/api/v1/payouts/status';
+$response = $client-&gt;get(
+    $url,
+    [
+        'headers' =&gt; [
+            'X-API-KEY' =&gt; 'string required Your API key for authentication.',
+            'X-API-SECRET' =&gt; 'string required Your API secret for encryption and authentication.',
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+        'json' =&gt; [
+            'transaction_id' =&gt; 'b',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'https://api-uat.makemypayment.in/api/v1/payouts/status'
+payload = {
+    "transaction_id": "b"
+}
+headers = {
+  'X-API-KEY': 'string required Your API key for authentication.',
+  'X-API-SECRET': 'string required Your API secret for encryption and authentication.',
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('GET', url, headers=headers, json=payload)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-payouts-status">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: true,
+    &quot;message&quot;: &quot;Payout status retrieved successfully&quot;,
+    &quot;data&quot;: {
+        &quot;transaction_id&quot;: &quot;TXN123456&quot;,
+        &quot;beneficiary&quot;: {
+            &quot;account_holder&quot;: &quot;John Doe&quot;,
+            &quot;account_number&quot;: &quot;1234567890&quot;,
+            &quot;bank_name&quot;: &quot;HDFC Bank&quot;,
+            &quot;ifsc_code&quot;: &quot;HDFC0001234&quot;
+        },
+        &quot;amount&quot;: &quot;1000.00&quot;,
+        &quot;status&quot;: &quot;success&quot;,
+        &quot;utr&quot;: &quot;UTR123456789&quot;,
+        &quot;remarks&quot;: &quot;Payment processed successfully&quot;
+    },
+    &quot;errors&quot;: null
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (400):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: false,
+    &quot;message&quot;: &quot;API key and secret are required&quot;,
+    &quot;data&quot;: null,
+    &quot;errors&quot;: []
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: false,
+    &quot;message&quot;: &quot;Invalid API key or secret&quot;,
+    &quot;data&quot;: null,
+    &quot;errors&quot;: []
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: false,
+    &quot;message&quot;: &quot;Request IP is not whitelisted for this merchant.&quot;,
+    &quot;data&quot;: null,
+    &quot;errors&quot;: []
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: false,
+    &quot;message&quot;: &quot;Payout not found&quot;,
+    &quot;data&quot;: null,
+    &quot;errors&quot;: []
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-payouts-status" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-payouts-status"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-payouts-status"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-payouts-status" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-payouts-status">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-payouts-status" data-method="GET"
+      data-path="api/v1/payouts/status"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-payouts-status', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-payouts-status"
+                    onclick="tryItOut('GETapi-v1-payouts-status');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-payouts-status"
+                    onclick="cancelTryOut('GETapi-v1-payouts-status');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-payouts-status"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/payouts/status</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>X-API-KEY</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="X-API-KEY"                data-endpoint="GETapi-v1-payouts-status"
+               value="string required Your API key for authentication."
+               data-component="header">
+    <br>
+<p>Example: <code>string required Your API key for authentication.</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>X-API-SECRET</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="X-API-SECRET"                data-endpoint="GETapi-v1-payouts-status"
+               value="string required Your API secret for encryption and authentication."
+               data-component="header">
+    <br>
+<p>Example: <code>string required Your API secret for encryption and authentication.</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-payouts-status"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-payouts-status"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>transaction_id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="transaction_id"                data-endpoint="GETapi-v1-payouts-status"
+               value="TXN123456"
+               data-component="url">
+    <br>
+<p>The transaction ID of the payout. Example: <code>TXN123456</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>transaction_id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="transaction_id"                data-endpoint="GETapi-v1-payouts-status"
+               value="b"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>b</code></p>
+        </div>
+        </form>
+
+            
+
+        
+    </div>
+    <div class="dark-box">
+                    <div class="lang-selector">
+                                                        <button type="button" class="lang-button" data-language-name="bash">bash</button>
+                                                        <button type="button" class="lang-button" data-language-name="javascript">javascript</button>
+                                                        <button type="button" class="lang-button" data-language-name="php">php</button>
+                                                        <button type="button" class="lang-button" data-language-name="python">python</button>
+                            </div>
+            </div>
+</div>
+</body>
+</html>

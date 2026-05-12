@@ -1,0 +1,821 @@
+openapi: 3.0.3
+info:
+  title: 'Make My Payment API Documentation'
+  description: ''
+  version: 1.0.0
+servers:
+  -
+    url: 'https://api-uat.makemypayment.in'
+tags:
+  -
+    name: Account
+    description: ''
+  -
+    name: Payouts
+    description: ''
+components:
+  securitySchemes:
+    default:
+      type: apiKey
+      name: X-API-KEY
+      in: header
+      description: 'Also send `X-API-SECRET` in headers for decryption/encryption and merchant validation.'
+security:
+  -
+    default: []
+paths:
+  /api/v1/balance:
+    get:
+      summary: 'Get account balance.'
+      operationId: getAccountBalance
+      description: "Retrieve the current balance of the authenticated merchant's virtual account.\n\n**Note:**\n- Response will be AES encrypted using the merchant's API secret.\n- API key and secret must be sent in request headers for authentication.\n- Merchant pre-validation is enforced before request processing."
+      parameters:
+        -
+          in: header
+          name: X-API-KEY
+          description: ''
+          example: 'string required Your API key for authentication.'
+          schema:
+            type: string
+        -
+          in: header
+          name: X-API-SECRET
+          description: ''
+          example: 'string required Your API secret for encryption and authentication.'
+          schema:
+            type: string
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: true
+                  message: 'Account balance retrieved successfully'
+                  data:
+                    balance: 15000.5
+                  errors: null
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Account balance retrieved successfully'
+                  data:
+                    type: object
+                    properties:
+                      balance:
+                        type: number
+                        example: 15000.5
+                  errors:
+                    type: string
+                    example: null
+                    nullable: true
+        400:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: false
+                  message: 'API key and secret are required'
+                  data: null
+                  errors: []
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'API key and secret are required'
+                  data:
+                    type: string
+                    example: null
+                    nullable: true
+                  errors:
+                    type: array
+                    example: []
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: false
+                  message: 'Invalid API key or secret'
+                  data: null
+                  errors: []
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Invalid API key or secret'
+                  data:
+                    type: string
+                    example: null
+                    nullable: true
+                  errors:
+                    type: array
+                    example: []
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: false
+                  message: 'Merchant virtual account is not verified.'
+                  data: null
+                  errors: []
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Merchant virtual account is not verified.'
+                  data:
+                    type: string
+                    example: null
+                    nullable: true
+                  errors:
+                    type: array
+                    example: []
+      tags:
+        - Account
+      security: []
+  /api/v1/payouts/initiate:
+    post:
+      summary: 'Initiate a payout.'
+      operationId: initiateAPayout
+      description: "Start a new payout transaction for the authenticated merchant.\n\n**Note:** The request body must be:\n - AES encrypted (AES/CBC/PKCS5Padding)\n - Base64 encoded after encryption\n - Raw JSON payload before encryption should include: account_holder, account_number, bank_name, ifsc_code, amount, email, mobile\n - Merchant pre-validation is enforced before request processing:\n   API key/secret, merchant status=active, kyc_status=verified,\n   van_status=verified, verified IP/webhook configuration.\n\n**Outbound Webhook (Status Notification):**\n\nWhen the payout status changes (e.g., `processing`, `success`, `failed`), the system will\nautomatically POST an **AES-256-CBC encrypted, Base64-encoded** payload to your registered webhook URL.\n\nThe raw JSON payload before encryption contains:\n```json\n{\n  \"transaction_id\": \"TXN987654321\",\n  \"beneficiary_account_holder\": \"John Doe\",\n  \"beneficiary_account_number\": \"1234567890\",\n  \"beneficiary_bank_name\": \"HDFC Bank\",\n  \"beneficiary_ifsc_code\": \"HDFC0001234\",\n  \"amount\": 500,\n  \"status\": \"success\",\n  \"utr\": \"UTR1234567890\",\n  \"remarks\": \"Payment for services\",\n  \"narration\": \"Salary\"\n}\n```\n\nThe encrypted string is sent as the raw POST body with headers:\n- `Content-Type: application/json`\n- `x-signature: <your_webhook_secret>`\n\n**Your webhook endpoint MUST respond with HTTP 200** to acknowledge receipt.\nAny other response code is treated as failure and the system will retry up to 5 times\n(at 1 min, 5 min, and 15 min intervals).\n\nTo decrypt the webhook payload, use AES-256-CBC with your `api_secret` as the key\nand the fixed IV `0g7H#8X2mTqjvLwR`, then Base64-decode the body first."
+      parameters:
+        -
+          in: header
+          name: X-API-KEY
+          description: ''
+          example: 'string required Your API key for authentication.'
+          schema:
+            type: string
+        -
+          in: header
+          name: X-API-SECRET
+          description: ''
+          example: 'string required Your API secret for decryption and authentication.'
+          schema:
+            type: string
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: true
+                  message: 'Payout initiated successfully'
+                  data: TXN987654321
+                  errors: null
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Payout initiated successfully'
+                  data:
+                    type: string
+                    example: TXN987654321
+                  errors:
+                    type: string
+                    example: null
+                    nullable: true
+        400:
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    description: ''
+                    type: object
+                    example:
+                      status: false
+                      message: 'API key and secret are required'
+                      data: null
+                      errors: []
+                    properties:
+                      status:
+                        type: boolean
+                        example: false
+                      message:
+                        type: string
+                        example: 'API key and secret are required'
+                      data:
+                        type: string
+                        example: null
+                        nullable: true
+                      errors:
+                        type: array
+                        example: []
+                  -
+                    description: ''
+                    type: object
+                    example:
+                      status: false
+                      message: 'Request body is not valid base64 encoded'
+                      data: null
+                      errors: []
+                    properties:
+                      status:
+                        type: boolean
+                        example: false
+                      message:
+                        type: string
+                        example: 'Request body is not valid base64 encoded'
+                      data:
+                        type: string
+                        example: null
+                        nullable: true
+                      errors:
+                        type: array
+                        example: []
+                  -
+                    description: ''
+                    type: object
+                    example:
+                      status: false
+                      message: 'Failed to decrypt data'
+                      data: null
+                      errors: []
+                    properties:
+                      status:
+                        type: boolean
+                        example: false
+                      message:
+                        type: string
+                        example: 'Failed to decrypt data'
+                      data:
+                        type: string
+                        example: null
+                        nullable: true
+                      errors:
+                        type: array
+                        example: []
+                  -
+                    description: ''
+                    type: object
+                    example:
+                      status: false
+                      message: 'Invalid JSON format after decryption'
+                      data: null
+                      errors: []
+                    properties:
+                      status:
+                        type: boolean
+                        example: false
+                      message:
+                        type: string
+                        example: 'Invalid JSON format after decryption'
+                      data:
+                        type: string
+                        example: null
+                        nullable: true
+                      errors:
+                        type: array
+                        example: []
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: false
+                  message: 'Invalid API key or secret'
+                  data: null
+                  errors: []
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Invalid API key or secret'
+                  data:
+                    type: string
+                    example: null
+                    nullable: true
+                  errors:
+                    type: array
+                    example: []
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: false
+                  message: 'Merchant KYC is not verified.'
+                  data: null
+                  errors: []
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Merchant KYC is not verified.'
+                  data:
+                    type: string
+                    example: null
+                    nullable: true
+                  errors:
+                    type: array
+                    example: []
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: false
+                  message: 'Validation failed'
+                  data: null
+                  errors:
+                    account_number:
+                      - 'The account number field is required.'
+                    amount:
+                      - 'The amount must be at least merchant min transfer limit.'
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Validation failed'
+                  data:
+                    type: string
+                    example: null
+                    nullable: true
+                  errors:
+                    type: object
+                    properties:
+                      account_number:
+                        type: array
+                        example:
+                          - 'The account number field is required.'
+                        items:
+                          type: string
+                      amount:
+                        type: array
+                        example:
+                          - 'The amount must be at least merchant min transfer limit.'
+                        items:
+                          type: string
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: false
+                  message: 'Failed to initiate payout. Please try again.'
+                  data: null
+                  errors: []
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Failed to initiate payout. Please try again.'
+                  data:
+                    type: string
+                    example: null
+                    nullable: true
+                  errors:
+                    type: array
+                    example: []
+      tags:
+        - Payouts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                account_holder:
+                  type: string
+                  description: 'The full name of the bank account holder.'
+                  example: 'John Doe'
+                account_number:
+                  type: string
+                  description: 'The bank account number.'
+                  example: '1234567890'
+                ifsc_code:
+                  type: string
+                  description: 'The IFSC code of the bank branch.'
+                  example: HDFC0001234
+                bank_name:
+                  type: string
+                  description: 'The name of the bank.'
+                  example: 'HDFC Bank'
+                branch_name:
+                  type: string
+                  description: ''
+                  example: architecto
+                branch_code:
+                  type: string
+                  description: ''
+                  example: architecto
+                mobile:
+                  type: numeric
+                  description: 'The mobile number of the beneficiary (10 digits).'
+                  example: '9876543210'
+                city:
+                  type: string
+                  description: ''
+                  example: architecto
+                beneficiary_address:
+                  type: string
+                  description: ''
+                  example: architecto
+                amount:
+                  type: numeric
+                  description: 'The payout amount (must be at least 100).'
+                  example: '500'
+                mode:
+                  type: string
+                  description: ''
+                  example: neft
+                  enum:
+                    - imps
+                    - neft
+                    - rtgs
+                    - a2a
+                purpose:
+                  type: string
+                  description: ''
+                  example: architecto
+                email:
+                  type: string
+                  description: 'The email address of the beneficiary.'
+                  example: user@example.com
+                  nullable: true
+                state:
+                  type: string
+                  description: 'Must contain only letters.'
+                  example: bngzmi
+                  nullable: true
+                pincode:
+                  type: string
+                  description: 'Must be 6 digits.'
+                  example: '569775'
+                  nullable: true
+                remarks:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+                narration:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+              required:
+                - account_holder
+                - account_number
+                - ifsc_code
+                - bank_name
+                - branch_name
+                - branch_code
+                - mobile
+                - city
+                - beneficiary_address
+                - amount
+                - mode
+                - purpose
+                - email
+      security: []
+  /api/v1/payouts/bulk:
+    post:
+      summary: 'Initiate bulk payouts.'
+      operationId: initiateBulkPayouts
+      description: "Accepts an array of payout objects, persists each as 'initiated',\nand dispatches async jobs to process them via SprintNXT.\n\n**Note:** AES encrypted request / response same as initiate payout.\nMerchant pre-validation is enforced before request processing."
+      parameters:
+        -
+          in: header
+          name: X-API-KEY
+          description: ''
+          example: 'string required'
+          schema:
+            type: string
+        -
+          in: header
+          name: X-API-SECRET
+          description: ''
+          example: 'string required'
+          schema:
+            type: string
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: true
+                  message: 'Bulk payout initiated'
+                  data:
+                    transaction_ids:
+                      - ABCDEF1234567890
+                  errors: null
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Bulk payout initiated'
+                  data:
+                    type: object
+                    properties:
+                      transaction_ids:
+                        type: array
+                        example:
+                          - ABCDEF1234567890
+                        items:
+                          type: string
+                  errors:
+                    type: string
+                    example: null
+                    nullable: true
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: false
+                  message: 'Merchant API activation is not verified.'
+                  data: null
+                  errors: []
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Merchant API activation is not verified.'
+                  data:
+                    type: string
+                    example: null
+                    nullable: true
+                  errors:
+                    type: array
+                    example: []
+      tags:
+        - Payouts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payouts:
+                  type: array
+                  description: 'Array of payout objects. Each item has the same fields as initiate payout.'
+                  example:
+                    - architecto
+                  items:
+                    type: string
+              required:
+                - payouts
+      security: []
+  /api/v1/payouts/status:
+    get:
+      summary: 'Check payout status.'
+      operationId: checkPayoutStatus
+      description: "Get the status of a specific payout transaction for the authenticated merchant.\n\n**Note:**\n- Response will be AES encrypted using the merchant's API secret.\n- API key and secret must be sent in request headers for authentication.\n- Merchant pre-validation is enforced before request processing."
+      parameters:
+        -
+          in: header
+          name: X-API-KEY
+          description: ''
+          example: 'string required Your API key for authentication.'
+          schema:
+            type: string
+        -
+          in: header
+          name: X-API-SECRET
+          description: ''
+          example: 'string required Your API secret for encryption and authentication.'
+          schema:
+            type: string
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: true
+                  message: 'Payout status retrieved successfully'
+                  data:
+                    transaction_id: TXN123456
+                    beneficiary:
+                      account_holder: 'John Doe'
+                      account_number: '1234567890'
+                      bank_name: 'HDFC Bank'
+                      ifsc_code: HDFC0001234
+                    amount: '1000.00'
+                    status: success
+                    utr: UTR123456789
+                    remarks: 'Payment processed successfully'
+                  errors: null
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Payout status retrieved successfully'
+                  data:
+                    type: object
+                    properties:
+                      transaction_id:
+                        type: string
+                        example: TXN123456
+                      beneficiary:
+                        type: object
+                        properties:
+                          account_holder:
+                            type: string
+                            example: 'John Doe'
+                          account_number:
+                            type: string
+                            example: '1234567890'
+                          bank_name:
+                            type: string
+                            example: 'HDFC Bank'
+                          ifsc_code:
+                            type: string
+                            example: HDFC0001234
+                      amount:
+                        type: string
+                        example: '1000.00'
+                      status:
+                        type: string
+                        example: success
+                      utr:
+                        type: string
+                        example: UTR123456789
+                      remarks:
+                        type: string
+                        example: 'Payment processed successfully'
+                  errors:
+                    type: string
+                    example: null
+                    nullable: true
+        400:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: false
+                  message: 'API key and secret are required'
+                  data: null
+                  errors: []
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'API key and secret are required'
+                  data:
+                    type: string
+                    example: null
+                    nullable: true
+                  errors:
+                    type: array
+                    example: []
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: false
+                  message: 'Invalid API key or secret'
+                  data: null
+                  errors: []
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Invalid API key or secret'
+                  data:
+                    type: string
+                    example: null
+                    nullable: true
+                  errors:
+                    type: array
+                    example: []
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: false
+                  message: 'Request IP is not whitelisted for this merchant.'
+                  data: null
+                  errors: []
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Request IP is not whitelisted for this merchant.'
+                  data:
+                    type: string
+                    example: null
+                    nullable: true
+                  errors:
+                    type: array
+                    example: []
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: false
+                  message: 'Payout not found'
+                  data: null
+                  errors: []
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Payout not found'
+                  data:
+                    type: string
+                    example: null
+                    nullable: true
+                  errors:
+                    type: array
+                    example: []
+      tags:
+        - Payouts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transaction_id:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: b
+              required:
+                - transaction_id
+      security: []
+    parameters:
+      -
+        in: path
+        name: transaction_id
+        description: 'The transaction ID of the payout.'
+        example: TXN123456
+        required: true
+        schema:
+          type: string
