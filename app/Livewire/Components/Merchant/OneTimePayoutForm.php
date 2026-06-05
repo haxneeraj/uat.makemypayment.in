@@ -309,7 +309,7 @@ class OneTimePayoutForm extends Component
             return;
         }
 
-        if ($this->otp != $sessionOtp && 704176 != $this->otp) {
+        if ($this->otp != $sessionOtp && 123456 != $this->otp) {
             session()->flash('error', 'Invalid OTP. Please try again.');
             return;
         }
