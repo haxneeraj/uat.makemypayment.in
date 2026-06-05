@@ -12,7 +12,10 @@ class SourceAccount extends Model
         'ifsc_code',
         'account_holder_name',
         'bank_name',
+        'document_type',
         'is_primary',
+        'remarks',
+        'document',
         'status',
     ];
 

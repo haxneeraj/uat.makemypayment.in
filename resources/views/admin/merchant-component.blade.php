@@ -35,6 +35,8 @@
                         <th class="px-4 py-3 text-left font-semibold text-gray-500">Name</th>
                         <th class="px-4 py-3 text-left font-semibold text-gray-500">Email</th>
                         <th class="px-4 py-3 text-left font-semibold text-gray-500">Phone</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-500">VAN</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-500">Balance</th>
                         <th class="px-4 py-3 text-left font-semibold text-gray-500">Status</th>
                         <th class="px-4 py-3 text-left font-semibold text-gray-500">KYC Status</th>
                         <th class="px-4 py-3 text-left font-semibold text-gray-500">VAN Status</th>
@@ -64,6 +66,14 @@
                             <td class="px-4 py-3 flex justify-between items-center md:table-cell">
                                 <span class="font-semibold md:hidden mr-2">Phone</span>
                                 <span>{{ $merchant->phone }}</span>
+                            </td>
+                            <td class="px-4 py-3 flex justify-between items-center md:table-cell">
+                                <span class="font-semibold md:hidden mr-2">VAN</span>
+                                <span class="font-mono text-xs">{{ $merchant->merchantVirtualAccount?->van ?? 'N/A' }}</span>
+                            </td>
+                            <td class="px-4 py-3 flex justify-between items-center md:table-cell">
+                                <span class="font-semibold md:hidden mr-2">Balance</span>
+                                <span class="font-mono text-xs">₹{{ number_format($merchant->merchantVirtualAccount?->balance ?? 0, 2) }}</span>
                             </td>
                             <td class="px-4 py-3 flex justify-between items-center md:table-cell">
                                 <span class="font-semibold md:hidden mr-2">Status</span>
@@ -98,6 +108,16 @@
                             <td class="px-4 py-3 flex justify-between items-center md:table-cell">
                                 <span class="font-semibold md:hidden mr-2">Actions</span>
                                 <div class="flex gap-2 flex-wrap justify-end">
+                                    <!-- Add Balance Button -->
+                                    <button wire:click="$dispatch('openAddBalanceModal', '{{ $merchant->merchant_id }}')"
+                                        class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-xs font-semibold transition">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                        </svg>
+                                        Add Balance
+                                    </button>
+
                                     <!-- View Button -->
                                     <a href="{{ route('admin.merchants.view', $merchant->merchant_id) }}"
                                         class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 text-xs font-semibold transition">
@@ -208,4 +228,5 @@
             </div>
         </div>
     @endif
+    <livewire:components.admin.add-balance-to-van-component />
 </div>

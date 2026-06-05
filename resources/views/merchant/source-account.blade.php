@@ -1,17 +1,4 @@
 <div class="mx-auto px-4 py-8">
-
-    {{-- Flash Messages --}}
-    @if(Session::has('success'))
-        <div class="mb-6 p-4 rounded-lg bg-green-100 text-green-800 font-medium">
-            {{ Session::get('success') }}
-        </div>
-    @endif
-    @if(Session::has('error'))
-        <div class="mb-6 p-4 rounded-lg bg-red-100 text-red-800 font-medium">
-            {{ Session::get('error') }}
-        </div>
-    @endif
-
     {{-- Header --}}
     <div class="flex items-center justify-between mb-6">
         <div>
@@ -81,12 +68,15 @@
                                 Primary
                             </span>
                         @endif
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold {{ $account->status === 'active' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-amber-100 text-amber-700 border border-amber-200' }}">
+                            {{ $account->status === 'active' ? 'Active' : 'Inactive' }}
+                        </span>
                     </div>
                     <div class="text-sm text-gray-500">{{ $account->bank_name }}</div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-2 text-sm">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-2 text-sm">
                 <div>
                     <div class="text-xs text-gray-400 font-semibold uppercase mb-0.5">Account Number</div>
                     <div class="text-gray-800 font-medium font-mono">{{ $account->account_number }}</div>
@@ -98,6 +88,20 @@
                 <div>
                     <div class="text-xs text-gray-400 font-semibold uppercase mb-0.5">Added On</div>
                     <div class="text-gray-800 font-medium">{{ $account->created_at->format('d M Y') }}</div>
+                </div>
+                <div>
+                    <div class="text-xs text-gray-400 font-semibold uppercase mb-0.5">Document</div>
+                    <div class="text-gray-800 font-medium">
+                        {{ $account->document_type === 'statement' ? 'Bank Statement' : ($account->document_type === 'cancel_cheque' ? 'Cancelled Cheque' : 'Document') }}
+                    </div>
+                    @if($account->document)
+                        <a href="{{ asset('storage/' . $account->document) }}" target="_blank" class="inline-flex items-center gap-1 mt-1 text-xs font-semibold text-appPrimary hover:underline">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            View File
+                        </a>
+                    @endif
                 </div>
             </div>
 
@@ -112,10 +116,10 @@
                     </span>
                 @elseif($deleteConfirmId === $account->id)
                     <div class="flex items-center gap-2">
-                        <span class="text-sm text-red-600 font-medium">Confirm delete?</span>
-                        <button wire:click="deleteAccount({{ $account->id }})"
+                        <span class="text-sm text-red-600 font-medium">Send OTP to delete?</span>
+                        <button wire:click="requestDeleteOtp({{ $account->id }})"
                             class="px-3 py-1.5 bg-red-600 text-white text-xs rounded-lg font-semibold hover:bg-red-700 transition">
-                            Yes, Delete
+                            Yes, Send OTP
                         </button>
                         <button wire:click="cancelDelete"
                             class="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs rounded-lg font-semibold hover:bg-gray-200 transition">
@@ -227,15 +231,24 @@
 
     {{-- Add Account Modal --}}
     @if($showAddModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" wire:key="add-modal">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8" @click.outside="$wire.closeAddModal()">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-lg font-bold text-gray-900">Add Source Account</h2>
+        <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-start justify-center py-8 px-4" wire:key="add-modal">
+            <div class="relative bg-white rounded-2xl shadow-xl max-w-2xl w-full mx-4 p-8" @click.outside="$wire.closeAddModal()">
+                <div class="absolute top-4 right-4">
                     <button wire:click="closeAddModal" class="text-gray-400 hover:text-gray-600">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                     </button>
+                </div>
+
+                <h2 class="text-2xl font-bold text-gray-900 mb-1">Add Source Account</h2>
+
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-blue-600 text-white">1 Details</span>
+                    <span class="text-gray-300 text-xs">›</span>
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-gray-200 text-gray-500">2 OTP</span>
+                    <span class="text-gray-300 text-xs">›</span>
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-gray-200 text-gray-500">3 Review</span>
                 </div>
 
                 <form wire:submit.prevent="addAccount" class="space-y-4">
@@ -260,6 +273,31 @@
                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
+
+                    {{-- Document Type --}}
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Document Type</label>
+                        <select wire:model.live="document_type"
+                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-appPrimary focus:ring-appPrimary sm:text-sm @error('document_type') border-red-400 @enderror">
+                            <option value="">Select document type</option>
+                            <option value="statement">Bank Statement</option>
+                            <option value="cancel_cheque">Cancelled Cheque</option>
+                        </select>
+                        @error('document_type')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Document Upload --}}
+                    @include('merchant.kyc._file-uploader', [
+                        'wireModel'   => 'document_file',
+                        'xRef'        => 'document_file_input',
+                        'label'       => $document_type === 'statement' ? 'Statement' : ($document_type === 'cancel_cheque' ? 'Cancel Cheque' : 'Statement / Cancel Cheque'),
+                        'required'    => true,
+                        'existingUrl' => null,
+                        'errorKey'    => 'document_file',
+                        'fileSize'    => 12,
+                    ])
 
                     {{-- Account Number --}}
                     <div x-data="{
@@ -319,7 +357,7 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                                     </svg>
-                                    Save Account
+                                    Submit for Review
                                 </span>
                             </span>
                             <span wire:loading wire:target="addAccount">
@@ -328,7 +366,7 @@
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                                     </svg>
-                                    Saving...
+                                    Submitting...
                                 </span>
                             </span>
                         </button>
@@ -356,6 +394,139 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    @endif
+
+    {{-- OTP Verification Modal --}}
+    @if($showOTPModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 px-4" x-data="{
+            resendTimer: @entangle('resendTimer'),
+            resendInterval: null,
+            startTimer() {
+                if (this.resendInterval) clearInterval(this.resendInterval);
+                if (this.resendTimer > 0) {
+                    this.resendInterval = setInterval(() => {
+                        if (this.resendTimer > 0) this.resendTimer--;
+                        if (this.resendTimer <= 0 && this.resendInterval) {
+                            clearInterval(this.resendInterval);
+                            this.resendInterval = null;
+                        }
+                    }, 1000);
+                }
+            }
+        }" x-init="startTimer(); $watch('resendTimer', (value) => {
+            if (value > 0 && !resendInterval) startTimer();
+            if (value <= 0 && resendInterval) {
+                clearInterval(resendInterval);
+                resendInterval = null;
+            }
+        })">
+            <div class="w-full max-w-md overflow-hidden rounded-2xl border border-indigo-100 bg-white shadow-[0_24px_70px_rgba(15,23,42,0.20)]">
+                <div class="bg-gradient-to-r from-indigo-600 to-cyan-600 px-6 py-4 text-white">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 11V7m0 0l-3 3m3-3l3 3m6 3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold leading-tight">
+                                {{ $otpAction === 'delete' ? 'Verify Delete Request' : 'Verify Source Account' }}
+                            </h3>
+                            <p class="text-xs text-indigo-100">
+                                {{ $otpAction === 'delete' ? 'Enter the OTP to delete this source account.' : 'Enter the OTP to submit this source account.' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6">
+                    <p class="mb-4 text-sm text-slate-600">
+                        We have sent an OTP to your registered mobile number. Verify to continue this action.
+                    </p>
+
+                    <div>
+                        <label for="otp" class="block text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">One-Time Password</label>
+                        <input
+                            type="text"
+                            id="otp"
+                            wire:model.defer="otp"
+                            maxlength="6"
+                            inputmode="numeric"
+                            pattern="[0-9]*"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                            class="mt-2 block w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-center text-2xl font-black tracking-[0.35em] text-slate-900 placeholder:tracking-normal placeholder:font-medium placeholder:text-sm placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                            placeholder="000000"
+                        >
+                        @error('otp') <span class="mt-1 block text-xs text-red-500">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="mt-4 flex items-center justify-between rounded-xl border border-indigo-100 bg-indigo-50 px-3 py-2">
+                        <span class="text-xs font-medium text-indigo-700">Did not receive OTP?</span>
+                        <template x-if="resendTimer > 0">
+                            <span class="text-xs font-semibold text-indigo-700">Resend in <span x-text="resendTimer"></span>s</span>
+                        </template>
+                        <template x-if="resendTimer <= 0">
+                            <button type="button" wire:click="resendActionOtp" class="text-xs font-semibold text-indigo-700 hover:text-indigo-900">
+                                Resend OTP
+                            </button>
+                        </template>
+                    </div>
+
+                    <div class="mt-6 flex flex-wrap justify-end gap-2">
+                        <button
+                            wire:click="cancelOtpVerification"
+                            wire:loading.attr="disabled"
+                            wire:loading.class="opacity-70 cursor-not-allowed"
+                            wire:target="cancelOtpVerification"
+                            class="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700"
+                        >
+                            <span wire:loading.remove wire:target="cancelOtpVerification">
+                                <span class="inline-flex items-center gap-1.5">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                    Cancel
+                                </span>
+                            </span>
+                            <span wire:loading wire:target="cancelOtpVerification">
+                                <span class="inline-flex items-center gap-1.5">
+                                    <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                                    </svg>
+                                    Closing...
+                                </span>
+                            </span>
+                        </button>
+                        <button
+                            wire:click="verifyActionOtp"
+                            wire:loading.attr="disabled"
+                            wire:loading.class="opacity-70 cursor-not-allowed"
+                            wire:target="verifyActionOtp"
+                            class="inline-flex items-center gap-1.5 rounded-lg bg-appPrimary px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                        >
+                            <span wire:loading.remove wire:target="verifyActionOtp">
+                                <span class="inline-flex items-center gap-1.5">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Verify & Continue
+                                </span>
+                            </span>
+                            <span wire:loading wire:target="verifyActionOtp">
+                                <span class="inline-flex items-center gap-1.5">
+                                    <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                                    </svg>
+                                    Verifying...
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     @endif

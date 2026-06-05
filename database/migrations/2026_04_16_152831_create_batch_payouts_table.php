@@ -24,6 +24,10 @@ return new class extends Migration
             $table->integer('rejected_count')->default(0)->comment('Number of rejected payouts');
 
             $table->string('tracker_id')->nullable()->comment('Unique identifier for tracking the batch across systems');
+            $table->enum('status', ['initiated', 'send_to_bank', 'success', 'failed'])->default('initiated');
+
+            // store the complete response from the payment gateway for future reference and debugging
+            $table->json('raw_payload')->nullable();
 
             $table->timestamps();
         });

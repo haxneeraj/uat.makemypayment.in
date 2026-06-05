@@ -214,26 +214,6 @@ class CallbackController extends Controller
 
         $payout->update($updates);
 
-        // If payout failed, schedule a refund for next day processing
-        if ($dbStatus === 'failed') {
-            PayoutRefund::firstOrCreate(
-                ['payout_id' => $payout->id],
-                [
-                    'user_id'      => $payout->user_id,
-                    'amount'       => $payout->total_amount > 0 ? $payout->total_amount : $payout->amount,
-                    'process_date' => now()->addDay()->toDateString(),
-                    'status'       => 'pending',
-                    'remarks'      => 'Payout failed via SprintNXT callback. Reason: ' . ($resolvedRemarks ?: 'N/A'),
-                ]
-            );
-
-            \Log::info('Payout refund scheduled for next day.', [
-                'payout_id'    => $payout->id,
-                'amount'       => $payout->total_amount ?: $payout->amount,
-                'process_date' => now()->addDay()->toDateString(),
-            ]);
-        }
-
         \Log::info('SprintNXT payout callback: payout updated', [
             'transaction_id' => $payout->transaction_id,
             'status'         => $dbStatus,

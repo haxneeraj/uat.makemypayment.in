@@ -27,7 +27,8 @@ class SMSService implements SMSServiceInterface
     }
 
     public function sendSMS($mobile, $message)
-    {
+    {        
+        \Log::info('SMS OTP:' . $message);
         if(blank($this->apiKey))
         {
             return true;

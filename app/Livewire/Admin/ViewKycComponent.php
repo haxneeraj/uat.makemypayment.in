@@ -78,6 +78,15 @@ class ViewKycComponent extends Component
                         'status'               => 'active',
                     ]);
                 }
+                else
+                {
+                    # If source account already exists, ensure it's marked as primary and active
+                    $sourceAccount = SourceAccount::where('user_id', $this->merchant->id)->where('account_number', $this->kyc->account_number)->first();
+                    $sourceAccount->update([
+                        'is_primary' => true,
+                        'status' => 'active',
+                    ]);
+                }
 
                 #Send Onboard Mail
             }

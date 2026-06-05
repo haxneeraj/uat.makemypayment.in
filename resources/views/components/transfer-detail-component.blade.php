@@ -87,6 +87,32 @@
                             </div>
                         </div>
 
+                        @if(auth()->check() && auth()->user()->role === 'admin' && $payout->user)
+                        <hr class="border-gray-100">
+
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Merchant Details</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                                <div>
+                                    <p class="text-xs text-gray-400">Merchant Full Name</p>
+                                    <p class="text-sm font-semibold text-gray-800">{{ $payout->user->full_name ?? 'N/A' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-400">Merchant ID</p>
+                                    <p class="text-sm font-semibold text-gray-800 font-mono">{{ $payout->user->merchant_id ?? 'N/A' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-400">Phone Number</p>
+                                    <p class="text-sm font-medium text-gray-800">{{ $payout->user->phone ?? 'N/A' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-400">Email</p>
+                                    <p class="text-sm font-medium text-gray-800">{{ $payout->user->email ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
                         <hr class="border-gray-100">
 
                         {{-- Beneficiary Info --}}

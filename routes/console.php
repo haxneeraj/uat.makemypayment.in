@@ -9,4 +9,6 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 // Process failed payout refunds every day at 9:00 AM
-Schedule::command('payout:process-refunds')->dailyAt('09:00');
+// Schedule::command('payout:process-refunds')->dailyAt('09:00');
+Schedule::command('payout:process-refunds')->everyMinute();
+

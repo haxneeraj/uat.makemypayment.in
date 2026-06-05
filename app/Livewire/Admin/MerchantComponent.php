@@ -89,6 +89,7 @@ class MerchantComponent extends Component
     public function render()
     {
         $query = User::query()
+        ->with('merchantVirtualAccount:id,user_id,van,balance')
             ->where('role', 'merchant');
 
         if (!blank($this->search)) {

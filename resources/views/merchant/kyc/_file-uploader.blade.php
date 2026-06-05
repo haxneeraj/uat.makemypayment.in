@@ -8,7 +8,15 @@
     $required    - bool: whether asterisk/required indicator is shown
     $existingUrl - URL of already uploaded file (or null/empty)
     $errorKey    - Livewire @error key (e.g. 'pan_front')
+
+    Optional variables:
+        $fileSize    - max upload size in MB (defaults to 5)
 --}}
+
+@php
+        $maxFileSizeMb = (isset($fileSize) && is_numeric($fileSize) && (int) $fileSize > 0) ? (int) $fileSize : 5;
+        $maxFileSizeBytes = $maxFileSizeMb * 1024 * 1024;
+@endphp
 
 <div
     x-data="{
@@ -21,11 +29,13 @@
         uploadProgress: 0,
         uploadDone: false,
         uploadError: false,
+        maxFileSizeMb: {{ $maxFileSizeMb }},
+        maxFileSizeBytes: {{ $maxFileSizeBytes }},
 
         handleFile(file) {
             if (!file) return;
-            if (file.size > 5 * 1024 * 1024) {
-                this.sizeError = 'File must be under 5MB';
+            if (file.size > this.maxFileSizeBytes) {
+                this.sizeError = 'File must be under ' + this.maxFileSizeMb + 'MB';
                 this.fileName = '';
                 this.previewUrl = '';
                 return;
@@ -49,7 +59,7 @@
         @if($required)
             <small class="text-red-600">*</small>
         @endif
-        <span class="text-gray-400 font-normal">&nbsp;(PDF / JPG / PNG · max 5MB)</span>
+        <span class="text-gray-400 font-normal">&nbsp;(PDF / JPG / PNG · max {{ $maxFileSizeMb }}MB)</span>
     </label>
 
     {{-- Drop zone --}}
@@ -75,8 +85,8 @@
             @change="
                 let f = $event.target.files[0];
                 if (!f) return;
-                if (f.size > 5 * 1024 * 1024) {
-                    sizeError = 'File must be under 5MB';
+                if (f.size > maxFileSizeBytes) {
+                    sizeError = 'File must be under ' + maxFileSizeMb + 'MB';
                     fileName = ''; previewUrl = '';
                     $el.value = '';
                     return;
@@ -92,7 +102,7 @@
                     d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
             </svg>
             <p class="text-sm text-gray-600"><span class="font-semibold">Click to upload</span> or drag &amp; drop</p>
-            <p class="text-xs text-gray-400 mt-0.5">PDF, JPG, PNG · max 5MB</p>
+            <p class="text-xs text-gray-400 mt-0.5">PDF, JPG, PNG · max {{ $maxFileSizeMb }}MB</p>
         </div>
 
         {{-- Image preview --}}

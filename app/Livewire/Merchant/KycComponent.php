@@ -456,7 +456,7 @@ class KycComponent extends Component
             $validation['cin_number'] = ['required', 'alpha_num', 'max:21'];
             $validation['cin_front'] = $this->cin_front_url ? 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120' : 'required|file|mimes:pdf,jpg,jpeg,png|max:5120';
             $validation['company_pan_front'] = $this->company_pan_front_url ? 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120' : 'required|file|mimes:pdf,jpg,jpeg,png|max:5120';
-            $validation['document_aoa'] = $this->document_aoa_url ? 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120' : 'required|file|mimes:pdf,jpg,jpeg,png|max:5120';
+            $validation['document_aoa'] = $this->document_aoa_url ? 'nullable|file|mimes:pdf,jpg,jpeg,png|max:12288' : 'required|file|mimes:pdf,jpg,jpeg,png|max:5120';
             $validation['document_moi'] = $this->document_moi_url ? 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120' : 'required|file|mimes:pdf,jpg,jpeg,png|max:5120';
             $validation['document_coi'] = $this->document_coi_url ? 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120' : 'required|file|mimes:pdf,jpg,jpeg,png|max:5120';
 
@@ -467,7 +467,12 @@ class KycComponent extends Component
         }
 
         # Validate the request
-        $this->validate($validation);
+        $this->validate($validation, [
+            'cin_front.required' => 'Board Resolution document is required.',
+            'cin_front.file'     => 'The Board Resolution must be a valid file.',
+            'cin_front.mimes'    => 'The Board Resolution must be a file of type: PDF, JPG, JPEG, or PNG.',
+            'cin_front.max'      => 'The Board Resolution file size must not exceed 5 MB.',
+        ]);
 
         $gstPan = substr($this->gstin, 2, 10);
         $panToMatch = ($this->business_type !== 'proprietor') ? $this->company_pan : $this->pan;
@@ -627,8 +632,10 @@ class KycComponent extends Component
                         'ifsc_code'           => $kyc->ifsc_code,
                         'account_holder_name' => $kyc->account_holder,
                         'bank_name'           => $kyc->bank_name,
+                        'document'            => $kyc->cancelled_cheque, // Storing cancelled cheque as document for source account
+                        'document_type'       => 'cancelled_cheque',
                         'is_primary'          => true,
-                        'status'              => 'active',
+                        'status'              => 'inactive',
                     ]
                 );
             }

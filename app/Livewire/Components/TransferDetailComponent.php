@@ -50,7 +50,7 @@ class TransferDetailComponent extends Component
 
     public function render()
     {
-        $payout = Payout::where('transaction_id', $this->transferId)->first();
+        $payout = Payout::with(['user'])->where('transaction_id', $this->transferId)->first();
         return view('components.transfer-detail-component', [
             'payout' => $payout,
         ])

@@ -15,6 +15,8 @@ class BatchPayout extends Model
         'accepted_count',
         'rejected_count',
         'tracker_id',
+        'status',
+        'raw_payload'
     ];
 
     public function payouts()

@@ -21,6 +21,8 @@ use App\Livewire\Admin\MerchantComponent as AdminMerchantComponent;
 use App\Livewire\Admin\ViewMerchantComponent as AdminViewMerchantComponent;
 use App\Livewire\Admin\EditMerchantComponent as AdminEditMerchantComponent;
 use App\Livewire\Admin\ReportComponent as AdminReportComponent;
+use App\Livewire\Admin\InwardReport as AdminInwardReportComponent;
+
 use App\Livewire\Admin\SettingComponent as AdminSettingComponent;
 use App\Livewire\Admin\PayoutComponent as AdminPayoutComponent;
 use App\Livewire\Admin\PendingKycComponent as AdminPendingKycComponent;
@@ -32,6 +34,7 @@ use App\Livewire\Admin\UpdateOrCreateStaffComponent as AdminUpdateOrCreateStaffC
 use App\Livewire\Admin\MerchantIPAndWebhookRequest as AdminMerchantIPAndWebhookRequestComponent;
 use App\Livewire\Admin\Category as AdminCategoryComponent;
 use App\Livewire\Admin\SubCategory as AdminSubCategoryComponent;
+use App\Livewire\Admin\SouceAccountVerification as AdminSouceAccountVerificationComponent;
 
 
 use App\Livewire\Merchant\DashboardComponent as MerchantDashboardComponent;
@@ -41,6 +44,8 @@ use App\Livewire\Merchant\WalletComponent;
 use App\Livewire\Merchant\OrganizationComponent;
 use App\Livewire\Merchant\DepositComponent;
 use App\Livewire\Merchant\ReportComponent;
+use App\Livewire\Merchant\InwardReport;
+
 use App\Livewire\Merchant\KycComponent;
 use App\Livewire\Merchant\KycStatusComponent;
 use App\Livewire\Merchant\SettingComponent;
@@ -79,6 +84,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth:sanc
     Route::get('/view-kyc/{merchant_id}', AdminViewKycComponent::class)->name('view-kyc');
     Route::get('/payouts', AdminPayoutComponent::class)->name('payouts');
     Route::get('/reports', AdminReportComponent::class)->name('reports');
+    Route::get('/inwards/reports', AdminInwardReportComponent::class)->name('inwards.reports');
+
+    // Source Account Verification
+    Route::get('/source-accounts', AdminSouceAccountVerificationComponent::class)->name('source-accounts');
 
     // Category and Sub-category routes
     Route::get('/categories', AdminCategoryComponent::class)->name('categories');
@@ -108,6 +117,8 @@ Route::group(['prefix' => 'payout', 'as' => 'merchant.', 'middleware' => ['auth:
     Route::get('/organization', OrganizationComponent::class)->name('organization');
     Route::get('/deposits', DepositComponent::class)->name('deposits');
     Route::get('/reports', ReportComponent::class)->name('reports');
+    Route::get('/inwards/reports', InwardReport::class)->name('inwards.reports');
+    
     Route::get('/invoices', Invoice::class)->name('invoices'); 
     Route::get('/settings', SettingComponent::class)->name('settings');
     Route::get('/source-accounts', MerchantSourceAccount::class)->name('source-accounts');

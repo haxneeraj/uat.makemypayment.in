@@ -111,14 +111,17 @@ class PayoutComponent extends Component
         */
 
         $payouts = (clone $baseQuery)
-            ->whereBetween('created_at', [$dateFrom, $dateTo])
-            ->filter([
-                'searchColumn' => $this->searchColumn,
-                'search'       => $this->search,
-                'status'       => $this->status,
-            ])
-            ->latest('id')
-            ->paginate($this->perPage);
+        ->with([
+            'refund:id,payout_id,amount,status',
+        ])
+        ->whereBetween('created_at', [$dateFrom, $dateTo])
+        ->filter([
+            'searchColumn' => $this->searchColumn,
+            'search'       => $this->search,
+            'status'       => $this->status,
+        ])
+        ->latest('id')
+        ->paginate($this->perPage);
 
         /*
         |--------------------------------------------------------------------------

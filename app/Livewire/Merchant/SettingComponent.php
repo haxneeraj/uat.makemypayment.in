@@ -5,6 +5,8 @@ namespace App\Livewire\Merchant;
 use Livewire\Component;
 use App\Models\User;
 use \Illuminate\Support\Facades\Hash;
+use App\Services\SMSService;
+use Illuminate\Support\Facades\Session;
 
 class SettingComponent extends Component
 {
@@ -22,6 +24,15 @@ class SettingComponent extends Component
     public $api_secret;
     public $has_api_credentials = false;
     public $showAPIpopup = false;
+    public $showOTPModal = false;
+    public $otp;
+    public $resendTimer = 0;
+
+    protected $otpSessionKey = 'settings_action_otp';
+    protected $otpActionKey = 'settings_action_otp_action';
+    protected $otpUserIdKey = 'settings_action_otp_user_id';
+    protected $otpPayloadKey = 'settings_action_otp_payload';
+    protected $resendWait = 90;
     
     public function mount()
     {
@@ -80,7 +91,7 @@ class SettingComponent extends Component
             'password' => Hash::make($this->password),
         ]);
 
-        session()->flash('success', 'Password updated successfully.');
+        $this->dispatch('toast', type: 'success', message: 'Password updated successfully.');
         $this->reset(['current_password', 'password', 'password_confirmation']);
     }
 
@@ -91,23 +102,145 @@ class SettingComponent extends Component
             'webhook_url'    => 'required|url',
             'webhook_secret' => 'required|min:16',
         ]);
+
         $this->showConfirmModal = false;
+
+        $merchantCallback = auth()->user()->merchantCallbackAndIP;
+        if ($merchantCallback && $merchantCallback->status === 'pending') {
+            $this->dispatch('toast', type: 'error', message: 'Your previous request is still pending. Please wait for admin approval.');
+            return;
+        }
+
+        $this->sendActionOtp('webhook');
+    }
+
+    public function verifyActionOtp()
+    {
+        $this->validate([
+            'otp' => ['required', 'digits:6'],
+        ]);
+
+        $sessionOtp = Session::get($this->otpSessionKey);
+        $action = Session::get($this->otpActionKey);
+        $userId = Session::get($this->otpUserIdKey);
+
+        if (!$sessionOtp || !$action || !$userId || (int) $userId !== (int) auth()->id()) {
+            $this->showOTPModal = false;
+            $this->otp = null;
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'otp' => 'OTP expired or invalid. Please try again.',
+            ]);
+        }
+
+        if ((string) $this->otp !== (string) $sessionOtp) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'otp' => 'Invalid OTP. Please try again.',
+            ]);
+        }
+
+        if ($action === 'webhook') {
+            $this->applyWebhookSettingsAfterOtp();
+        }
+
+        if ($action === 'api_credentials') {
+            $this->generateApiCredentialsAfterOtp();
+        }
+
+        Session::forget($this->otpSessionKey);
+        Session::forget($this->otpActionKey);
+        Session::forget($this->otpUserIdKey);
+        Session::forget($this->otpPayloadKey);
+
+        $this->showOTPModal = false;
+        $this->otp = null;
+        $this->resendTimer = 0;
+    }
+
+    public function resendActionOtp()
+    {
+        if ((int) $this->resendTimer > 0) {
+            return;
+        }
+
+        $action = Session::get($this->otpActionKey);
+        if (!in_array($action, ['webhook', 'api_credentials'], true)) {
+            return;
+        }
+
+        $this->sendActionOtp($action);
+    }
+
+    public function cancelOtpVerification()
+    {
+        Session::forget($this->otpSessionKey);
+        Session::forget($this->otpActionKey);
+        Session::forget($this->otpUserIdKey);
+        Session::forget($this->otpPayloadKey);
+
+        $this->showOTPModal = false;
+        $this->otp = null;
+        $this->resendTimer = 0;
+    }
+
+    private function sendActionOtp(string $action)
+    {
+        $merchant = auth()->user();
+        $mobile = $merchant->phone ?? null;
+
+        if (blank($mobile)) {
+            $this->dispatch('toast', type: 'error', message: 'Unable to send OTP. Please update your registered mobile number.');
+            return;
+        }
+
+        $otp = random_int(100000, 999999);
+        Session::put($this->otpSessionKey, (string) $otp);
+        Session::put($this->otpActionKey, $action);
+        Session::put($this->otpUserIdKey, $merchant->id);
+
+        if ($action === 'webhook') {
+            Session::put($this->otpPayloadKey, [
+                'ip' => $this->ip,
+                'webhook_url' => $this->webhook_url,
+                'webhook_secret' => $this->webhook_secret,
+            ]);
+        }
+
+        app(SMSService::class)->sendSMS($mobile, $otp);
+
+        $this->showAPIpopup = false;
+        $this->showConfirmModal = false;
+        $this->showOTPModal = true;
+        $this->otp = null;
+        $this->resendTimer = $this->resendWait;
+        $this->resetErrorBag('otp');
+
+        $this->dispatch('toast', type: 'success', message: 'OTP sent successfully. Please verify to continue.');
+    }
+
+    private function applyWebhookSettingsAfterOtp()
+    {
+        $payload = Session::get($this->otpPayloadKey, []);
+        if (empty($payload)) {
+            $this->dispatch('toast', type: 'error', message: 'Webhook payload not found. Please try again.');
+            return;
+        }
 
         $merchantCallback = auth()->user()->merchantCallbackAndIP;
 
         if ($merchantCallback) {
             if ($merchantCallback->status === 'pending') {
-                return session()->flash('error', 'Your previous request is still pending. Please wait for admin approval.');
+                $this->dispatch('toast', type: 'error', message: 'Your previous request is still pending. Please wait for admin approval.');
+                return;
             }
 
-            $merchantCallback->update($this->only(['ip', 'webhook_url', 'webhook_secret']) + ['status' => 'pending']);
+            $merchantCallback->update($payload + ['status' => 'pending']);
         } else {
             auth()->user()->merchantCallbackAndIP()->create(
-                $this->only(['ip', 'webhook_url', 'webhook_secret']) + ['status' => 'pending']
+                $payload + ['status' => 'pending']
             );
         }
 
-        session()->flash('success', 'Settings updated successfully. Waiting for admin approval.');
+        $this->dispatch('toast', type: 'success', message: 'Settings updated successfully. Waiting for admin approval.');
     }
 
     public function generateAPICredentials()
@@ -118,23 +251,27 @@ class SettingComponent extends Component
             return;
         }
 
-        $this->showAPIpopup = false;
+        $this->sendActionOtp('api_credentials');
 
+    }
+
+    private function generateApiCredentialsAfterOtp()
+    {
         $merchant = auth()->user();
         $this->api_key = $this->generateAPIKey();
 
-        // secret 
         do {
             $secret = $this->generateAPISecret();
         } while (User::where('api_secret', $secret)->exists());
 
-        $this->api_secret = $this->generateAPISecret();
+        $this->api_secret = $secret;
         $merchant->api_key = $this->api_key;
         $merchant->api_secret = $secret;
         $merchant->save();
 
         $type = $this->has_api_credentials ? 'regenerated' : 'generated';
-        session()->flash('success', "API credentials have been {$type} successfully.");
+        $this->has_api_credentials = true;
+        $this->dispatch('toast', type: 'success', message: "API credentials have been {$type} successfully.");
 
     }
 

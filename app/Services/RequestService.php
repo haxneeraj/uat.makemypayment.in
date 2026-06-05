@@ -28,7 +28,8 @@ class RequestService
             $encryptedRequest = $this->preparePayload($data, $token);
 
             // Step 3: make request (key header carries the encrypted AES key)
-            $response = Http::withHeaders([
+            $response = Http::timeout(120)
+            ->withHeaders([
                 'User-Agent' => 'NXT728453-Snxt-Payments',
                 'client-id' => env('SPRINTNXT_CLIENT_ID'),
                 'partnerId' => env('SPRINTNXT_PARTNER_ID'),
@@ -38,7 +39,7 @@ class RequestService
             ->post(config('sprintnxt-endpoints.base_url') . $endpoint);
 
             $responseData = $response->json();
-            Log::info("RequestService [{$endpoint}] raw response: " . json_encode($responseData));
+            Log::channel('payout')->info("RequestService [{$endpoint}] raw response: " . json_encode($responseData));
 
             // SprintNXT wraps all responses (success & error) in {"body":"encrypted","code":200}
             // Process whenever the encrypted body field is present, regardless of HTTP status
@@ -48,24 +49,24 @@ class RequestService
                 $responseKey     = $responseHeaders['key'][0] ?? null;
 
                 if (!$responseKey) {
-                    Log::error("RequestService [{$endpoint}] missing key header. Headers: " . json_encode($responseHeaders));
+                    Log::channel('payout')->error("RequestService [{$endpoint}] missing key header. Headers: " . json_encode($responseHeaders));
                     throw new Exception("Decryption key missing from response headers");
                 }
 
                 // decrypt the response body and return full array
                 $decryptedData = EncryptionService::decData($responseData['body'], $responseKey);
-                Log::info("RequestService [{$endpoint}] decrypted: " . json_encode($decryptedData));                
+                Log::channel('payout')->info("RequestService [{$endpoint}] decrypted: " . json_encode($decryptedData));                
 
                 return $decryptedData;
             }
 
-            Log::error("RequestService post [{$endpoint}] error: HTTP {$response->status()} — " . $response->body());
+            Log::channel('payout')->error("RequestService post [{$endpoint}] error: HTTP {$response->status()} — " . $response->body());
             throw new Exception("Unexpected response (HTTP {$response->status()}): " . $response->body());
 
         } 
         catch (Exception $e) 
         {
-            Log::error("RequestService post [{$endpoint}] error: " . $e->getMessage());
+            Log::channel('payout')->error("RequestService post [{$endpoint}] error: " . $e->getMessage());
             throw new Exception("Failed to post request: " . $e->getMessage());
         }
     }

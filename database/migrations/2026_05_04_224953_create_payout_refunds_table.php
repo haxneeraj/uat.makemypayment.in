@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('payout_id')->constrained('payouts')->onDelete('cascade');
+            $table->foreignId('deposit_id')->constrained('deposits')->onDelete('cascade');
             $table->decimal('amount', 12, 2)->comment('Total amount to refund (payout amount + fee)');
             $table->date('process_date')->comment('Date on which this refund should be credited to wallet');
             $table->enum('status', ['pending', 'processed', 'failed'])->default('pending');

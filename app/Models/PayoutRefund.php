@@ -9,6 +9,7 @@ class PayoutRefund extends Model
     protected $fillable = [
         'user_id',
         'payout_id',
+        'deposit_id',
         'amount',
         'process_date',
         'status',
@@ -30,5 +31,10 @@ class PayoutRefund extends Model
     public function payout()
     {
         return $this->belongsTo(Payout::class);
+    }
+
+    public function deposit()
+    {
+        return $this->belongsTo(Deposit::class);
     }
 }

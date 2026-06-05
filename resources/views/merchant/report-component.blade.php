@@ -25,6 +25,14 @@
                     this.start = new Date(from);
                     this.end = new Date(to);
                     this.display = this.fmt(this.start) + ' -> ' + this.fmt(this.end);
+                } else {
+                    // Default to today
+                    const today = new Date();
+                    this.start = new Date(today);
+                    this.end = new Date(today);
+                    this.display = this.fmt(this.start) + ' -> ' + this.fmt(this.end);
+                    this.$wire.set('dateFrom', this.fmtYMD(this.start));
+                    this.$wire.set('dateTo', this.fmtYMD(this.end));
                 }
                 window.addEventListener('resize', () => {
                     if (this.open) this.calcPosition();
@@ -168,19 +176,49 @@
             <div class="mt-3 text-2xl sm:text-3xl font-black">&#8377;{{ number_format((float) ($summary->total_volume ?? 0), 2) }}</div>
             <div class="mt-4 flex flex-wrap gap-2">
                 <button wire:click="downloadCsv" type="button"
+                wire:loading.attr="disabled"
+                wire:loading.class="cursor-not-allowed opacity-50"
+                wire:target="downloadCsv"
                     class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#6c3ec5] text-white text-xs font-bold shadow hover:bg-[#5a33a8] transition">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0l4-4m-4 4l-4-4M4 17v1a2 2 0 002 2h12a2 2 0 002-2v-1"/>
-                    </svg>
-                    Download CSV
+                    <span wire:loading.remove wire:target="downloadCsv">
+                        <span class="flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0l4-4m-4 4l-4-4M4 17v1a2 2 0 002 2h12a2 2 0 002-2v-1"/>
+                            </svg>
+                            Download CSV
+                        </span>
+                    </span>
+                    <span wire:loading wire:target="downloadCsv">
+                        <span class="flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 12a8 8 0 018-8v3l4-4-4-4v3a12 12 0 100 24 8 8 0 01-8-8"/>
+                            </svg>
+                            <span>Downloading...</span>
+                        </span>
+                    </span>
                 </button>
                 <button wire:click="downloadPdf" type="button"
+                wire:loading.attr="disabled"
+                wire:loading.class="cursor-not-allowed opacity-50"
+                wire:target="downloadPdf"
                     class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/90 border border-[#d8c0ff] text-[#6d4ca2] text-xs font-bold shadow-sm hover:bg-white transition">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h6l4 4v14H7a2 2 0 01-2-2V5a2 2 0 012-2z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 3v5h5"/>
-                    </svg>
-                    Download PDF
+                    <span wire:loading.remove wire:target="downloadPdf">
+                        <span class="flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h6l4 4v14H7a2 2 0 01-2-2V5a2 2 0 012-2z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 3v5h5"/>
+                            </svg>
+                            Download PDF
+                        </span>
+                    </span>
+                    <span wire:loading wire:target="downloadPdf">
+                        <span class="flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 12a8 8 0 018-8v3l4-4-4-4v3a12 12 0 100 24 8 8 0 01-8-8"/>
+                            </svg>
+                            <span>Downloading...</span>
+                        </span>
+                    </span>
                 </button>
             </div>
         </div>
@@ -205,24 +243,24 @@
             </div>
         </div>
 
-        <div class="relative overflow-hidden rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-[#2b3990] via-[#3347ac] to-[#5164c4] border border-[#3c4fae] shadow-sm">
-            <div class="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-indigo-100">
+        <div class="relative overflow-hidden rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-rose-600 via-rose-700 to-red-700 border border-rose-800 shadow-sm">
+            <div class="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-rose-50">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3 1.343 3 3-1.343 3-3 3m0-12c1.11 0 2.08.402 2.8 1.07M12 8V5m0 3v0m0 6v0m0 3v3m-2.8-4.07A3.987 3.987 0 019 17"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86l-7.2 12.46A2 2 0 004.82 19h14.36a2 2 0 001.73-2.68l-7.2-12.46a2 2 0 00-3.46 0z"/>
                 </svg>
-                <span>Inward Funds</span>
+                <span>Failed Transactions</span>
             </div>
-            <div class="mt-3 text-2xl sm:text-3xl font-black text-white">&#8377;{{ number_format((float) ($summary->inward_volume ?? 0), 2) }}</div>
-            <div class="mt-4 inline-flex items-center px-3 py-1 rounded-full bg-white/15 border border-white/25 text-indigo-100 text-xs font-semibold">
-                {{ number_format((int) ($summary->inward_transactions ?? 0)) }} inward transactions
+            <div class="mt-3 text-2xl sm:text-3xl font-black text-white">&#8377;{{ number_format((float) ($summary->failed_volume ?? 0), 2) }}</div>
+            <div class="mt-4 inline-flex items-center px-3 py-1 rounded-full bg-white/15 border border-white/25 text-rose-50 text-xs font-semibold">
+                {{ number_format((int) ($summary->failed_transactions ?? 0)) }} failed transactions
             </div>
             <div class="mt-3 h-1.5 rounded-full bg-white/20 overflow-hidden">
-                <div class="h-full rounded-full bg-white/70" style="width: {{ $successRate }}%"></div>
+                <div class="h-full rounded-full bg-white/80" style="width: {{ $failedRate }}%"></div>
             </div>
             <div class="mt-3">
-                <a href="{{ route('merchant.wallet') }}"
+                <a href="{{ route('merchant.reports', ['status' => 'failed']) }}"
                     class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/10 border border-white/30 text-white text-xs font-bold hover:bg-white/20 transition">
-                    Open Inward Funds Page
+                    View Failed Report
                 </a>
             </div>
         </div>
@@ -238,26 +276,27 @@
             </div>
             <div class="-mx-1 overflow-x-auto pb-1">
                 <div class="inline-flex min-w-max items-center gap-2 px-1 snap-x snap-mandatory">
-                    <button wire:click="$set('entryType', 'payout')"
-                        class="snap-start shrink-0 inline-flex items-center gap-2 whitespace-nowrap px-4 py-2.5 rounded-xl text-sm font-semibold border transition duration-200 focus:outline-none {{ $entryType === 'payout' ? 'bg-violet-100 text-violet-700 border-violet-200 shadow-sm' : 'bg-white text-slate-600 border-[#e2e6f3] hover:bg-violet-50 hover:border-violet-200' }}">
-                        <span class="h-2 w-2 rounded-full {{ $entryType === 'payout' ? 'bg-violet-500' : 'bg-violet-300' }}"></span>
+                    <a href="{{ route('merchant.reports') }}"
+                        class="snap-start shrink-0 inline-flex items-center gap-2 whitespace-nowrap px-4 py-2.5 rounded-xl text-sm font-semibold border transition duration-200 focus:outline-none bg-violet-100 text-violet-700 border-violet-200 shadow-sm">
+                        <span class="h-2 w-2 rounded-full bg-violet-500"></span>
                         Payout
-                        <span class="text-xs font-bold px-2 py-0.5 rounded-full {{ $entryType === 'payout' ? 'bg-violet-200 text-violet-800' : 'bg-slate-100 text-slate-500' }}">{{ number_format((int) ($summary->payout_transactions ?? 0)) }}</span>
-                    </button>
-                    <button wire:click="$set('entryType', 'deposit')"
-                        class="snap-start shrink-0 inline-flex items-center gap-2 whitespace-nowrap px-4 py-2.5 rounded-xl text-sm font-semibold border transition duration-200 focus:outline-none {{ $entryType === 'deposit' ? 'bg-sky-100 text-sky-700 border-sky-200 shadow-sm' : 'bg-white text-slate-600 border-[#e2e6f3] hover:bg-sky-50 hover:border-sky-200' }}">
-                        <span class="h-2 w-2 rounded-full {{ $entryType === 'deposit' ? 'bg-sky-500' : 'bg-sky-300' }}"></span>
+                        <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-violet-200 text-violet-800">{{ number_format((int) ($summary->payout_transactions ?? 0)) }}</span>
+                    </a>
+                    <a href="{{ route('merchant.inwards.reports') }}"
+                        class="snap-start shrink-0 inline-flex items-center gap-2 whitespace-nowrap px-4 py-2.5 rounded-xl text-sm font-semibold border transition duration-200 focus:outline-none bg-white text-slate-600 border-[#e2e6f3] hover:bg-sky-50 hover:border-sky-200">
+                        <span class="h-2 w-2 rounded-full bg-sky-300"></span>
                         Inward Funds
-                        <span class="text-xs font-bold px-2 py-0.5 rounded-full {{ $entryType === 'deposit' ? 'bg-sky-200 text-sky-800' : 'bg-slate-100 text-slate-500' }}">{{ number_format((int) ($summary->inward_transactions ?? 0)) }}</span>
-                    </button>
+                        <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-sky-200 text-sky-800">{{ number_format((int) ($summary->inward_transactions ?? 0)) }}</span>
+                    </a>
                 </div>
             </div>
         </div>
 
         <div class="flex flex-wrap items-center gap-3">
             <select wire:model.live="searchBy" class="cursor-pointer border border-[#dde2ef] rounded-2xl px-8 py-2 text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200">
-                <option value="account_holder">Beneficiary Name</option>
-                <option value="account_number">Account Number</option>
+                <option value="name">Beneficiary Name</option>
+                <option value="bank">Bank Name</option>
+                <option value="account">Account Number</option>
                 <option value="utr">UTR Number</option>
                 <option value="transaction_id">Transfer ID</option>
             </select>
@@ -268,7 +307,7 @@
                 </svg>
                 <input wire:model.live.debounce.300ms="search" type="text"
                     class="border border-[#dde2ef] rounded-2xl pl-9 pr-3 py-2 text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 min-w-[220px]"
-                    placeholder="Search reports...">
+                    placeholder="Search payouts...">
             </div>
 
             <select wire:model.live="status" class="cursor-pointer border border-[#dde2ef] rounded-2xl px-4 py-2 text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200">
@@ -276,15 +315,9 @@
                 <option value="success">Success</option>
                 <option value="failed">Failed</option>
                 <option value="pending">Pending</option>
-                @if($entryType !== 'deposit')
                 <option value="initiated">Initiated</option>
                 <option value="processed">Processed</option>
                 <option value="send_to_bank">Send To Bank</option>
-                @endif
-                @if($entryType !== 'payout')
-                <option value="duplicate">Duplicate</option>
-                <option value="technical_reject">Technical Reject</option>
-                @endif
             </select>
 
             <div x-data="reportRangePicker()" x-on:report-filters-cleared.window="clearRange()">
@@ -402,7 +435,7 @@
 
             </div>
 
-            @if($search || $dateFrom || $dateTo || $status || $searchBy !== 'reference' || $entryType)
+            @if($search || $dateFrom || $dateTo || $status || $searchBy !== 'reference')
             <button wire:click="clearFilters"
                 class="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl border border-rose-200 bg-rose-50 text-rose-600 text-sm font-semibold hover:bg-rose-100 transition">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -418,11 +451,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z"/>
             </svg>
             <p class="leading-relaxed">
-                @if($entryType === 'deposit')
-                    Showing <span class="font-semibold text-sky-700">Inward Funds</span> — current month{{ $dateFrom ? '' : ' (default)' }}. Switch tab to view Payouts.
-                @else
-                    Showing <span class="font-semibold text-violet-700">Payout</span> transactions — current month{{ $dateFrom ? '' : ' (default)' }}. Switch tab to view Inward Funds.
-                @endif
+                Showing <span class="font-semibold text-violet-700">Payout</span> transactions — today{{ $dateFrom ? '' : ' (default)' }}.
             </p>
         </div>
     </div>
@@ -434,10 +463,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h10.5M8.25 12h10.5m-10.5 5.25h10.5M3.75 6.75h.008v.008H3.75V6.75zm0 5.25h.008v.008H3.75V12zm0 5.25h.008v.008H3.75v-.008z"/>
                 </svg>
                 <h3 class="text-base sm:text-lg font-bold text-slate-900">
-                    @if($entryType === 'payout') Payout Report History
-                    @elseif($entryType === 'deposit') Inward Funds Report History
-                    @else Complete Report History
-                    @endif
+                    Payout Report History
                 </h3>
             </div>
             <select wire:model.live="perPage" class="cursor-pointer border border-[#dde2ef] rounded-2xl px-5 py-2 text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200">
@@ -449,77 +475,102 @@
         </div>
 
         <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
-            <thead>
-                <tr class="bg-white text-left">
-                    <th class="px-4 py-3 text-left font-semibold text-gray-500 whitespace-nowrap">Reference No</th>
-                    @if(!$entryType)
-                    <th class="px-4 py-3 text-left font-semibold text-gray-500 whitespace-nowrap">Type</th>
-                    @endif
-                    <th class="px-4 py-3 text-left font-semibold text-gray-500 whitespace-nowrap">Name</th>
-                    <th class="px-4 py-3 text-left font-semibold text-gray-500 whitespace-nowrap">Bank</th>
-                    <th class="px-4 py-3 text-left font-semibold text-gray-500 whitespace-nowrap">Account</th>
-                    <th class="px-4 py-3 text-left font-semibold text-gray-500 whitespace-nowrap">Amount</th>
-                    <th class="px-4 py-3 text-left font-semibold text-gray-500 whitespace-nowrap">Charges</th>
-                    <th class="px-4 py-3 text-left font-semibold text-gray-500 whitespace-nowrap">Total</th>
-                    <th class="px-4 py-3 text-left font-semibold text-gray-500 whitespace-nowrap">Date</th>
-                    <th class="px-4 py-3 text-left font-semibold text-gray-500 whitespace-nowrap">Status</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-                @forelse($reports as $row)
-                <tr class="hover:bg-white/90 transition">
-                    <td class="px-4 py-3 font-mono text-xs text-indigo-600 whitespace-nowrap font-semibold">{{ $row->reference_no }}</td>
-                    @if(!$entryType)
-                    <td class="px-4 py-3 whitespace-nowrap">
-                        @if($row->entry_type === 'payout')
-                            <span class="bg-violet-100 text-violet-700 px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">Payout</span>
-                        @else
-                            <span class="bg-sky-100 text-sky-700 px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">Inward</span>
-                        @endif
-                    </td>
-                    @endif
-                    <td class="px-4 py-3 text-slate-700 whitespace-nowrap">{{ $row->party_name ?: 'N/A' }}</td>
-                    <td class="px-4 py-3 text-slate-700 whitespace-nowrap">{{ $row->bank_name ?: 'N/A' }}</td>
-                    <td class="px-4 py-3 font-mono text-xs text-slate-700 whitespace-nowrap">{{ $row->account_no ?: 'N/A' }}</td>
-                    <td class="px-4 py-3 font-semibold text-slate-900 whitespace-nowrap">&#8377;{{ number_format((float) $row->amount, 2) }}</td>
-                    <td class="px-4 py-3 text-slate-700 whitespace-nowrap">&#8377;{{ number_format((float) $row->charges, 2) }}</td>
-                    <td class="px-4 py-3 font-semibold text-slate-900 whitespace-nowrap">&#8377;{{ number_format((float) $row->total_amount, 2) }}</td>
-                    <td class="px-4 py-3 text-slate-600 whitespace-nowrap text-xs">{{ $row->txn_at ? \Carbon\Carbon::parse($row->txn_at)->format('d M Y, h:i A') : 'N/A' }}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">
-                        @php
-                            $statusClass = match($row->source_status) {
-                                'success'          => 'bg-emerald-100 text-emerald-700',
-                                'failed'           => 'bg-rose-100 text-rose-700',
-                                'pending'          => 'bg-amber-100 text-amber-700',
-                                'initiated'        => 'bg-sky-100 text-sky-700',
-                                'processed'        => 'bg-indigo-100 text-indigo-700',
-                                'send_to_bank'     => 'bg-violet-100 text-violet-700',
-                                'duplicate'        => 'bg-yellow-100 text-yellow-700',
-                                'technical_reject' => 'bg-red-100 text-red-700',
-                                default            => 'bg-gray-100 text-gray-700',
-                            };
-                        @endphp
-                        <span class="{{ $statusClass }} px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap">
-                            {{ ucfirst(str_replace('_', ' ', $row->source_status)) }}
-                        </span>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="9" class="px-4 py-10 text-center text-slate-400">
-                        <svg class="w-10 h-10 mx-auto mb-2 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75"/>
-                        </svg>
-                        No records found for selected filters.
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+            <table class="min-w-full text-sm">
+                <thead>
+                    <tr class="bg-white text-left">
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">#</th>
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Initiated At</th>
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Transaction ID</th>
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Reference ID</th>
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Beneficiary</th>
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Bank Details</th>
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Mobile</th>
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">UTR Number</th>
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Amount</th>
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Fee</th>
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Total Amount</th>
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Opening Balance</th>
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Closing Balance</th>
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Mode</th>
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($reports as $payout)
+                        <tr class="hover:bg-white/90 transition">                            
+                            <td class="px-4 py-3 font-mono text-xs text-slate-400 whitespace-nowrap">{{ $loop->iteration }}</td>
+                            <td class="px-4 py-3 text-slate-600 whitespace-nowrap text-xs">
+                                {{ \Carbon\Carbon::parse($payout->initiated_at)->format('d M Y, h:i A') }}
+                                @if($payout->processed_at)
+                                    <div class="text-slate-400 mt-0.5">Done: {{ \Carbon\Carbon::parse($payout->processed_at)->format('d M Y, h:i A') }}</div>
+                                @endif
+                            </td>
+                            
+                            <td class="px-4 py-3 cursor-pointer text-indigo-600 whitespace-nowrap font-mono text-xs font-semibold hover:underline"
+                                wire:click="$dispatch('openTransferDetailModal', { transferId: '{{ $payout->transaction_id }}' })">
+                                {{ $payout->transaction_id }}
+                            </td>
+                            <td class="px-4 py-3 text-indigo-600 whitespace-nowrap font-mono text-xs font-semibold">{{ $payout->merchant_reference_id ?? 'N/A' }}</td>
+                            <td class="px-4 py-3">
+                                <div class="font-medium text-slate-900">{{ $payout->account_holder }}</div>
+                                <div class="text-xs text-slate-400 mt-0.5">{{ $payout->account_number }}</div>
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="text-slate-700">{{ $payout->bank_name }}</div>
+                                <div class="text-xs text-slate-400 mt-0.5">{{ $payout->ifsc_code }}</div>
+                            </td>
+                            <td class="px-4 py-3 text-slate-700 whitespace-nowrap">{{ $payout->mobile }}</td>
+                            <td class="px-4 py-3 text-slate-700 whitespace-nowrap">
+                                @if(!blank($payout->utr))
+                                    {{ $payout->utr }}
+                                @else
+                                    <span class="text-slate-400 text-xs">N/A</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 font-semibold text-slate-900 whitespace-nowrap">₹{{ number_format($payout->amount, 2) }}</td>
+                            <td class="px-4 py-3 text-slate-700 whitespace-nowrap">₹{{ number_format($payout->fee ?? 0, 2) }}</td>
+                            <td class="px-4 py-3 font-semibold text-slate-900 whitespace-nowrap">₹{{ number_format($payout->total_amount ?? ($payout->amount + ($payout->fee ?? 0)), 2) }}</td>
+                        <td class="px-4 py-3 text-slate-700 whitespace-nowrap">₹{{ number_format($payout->opening_balance ?? 0, 2) }}</td>
+                        <td class="px-4 py-3 font-semibold text-slate-900 whitespace-nowrap">₹{{ number_format($payout->closing_balance ?? 0, 2) }}</td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-semibold uppercase">{{ $payout->mode }}</span>
+                            </td>
+                            
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                @php
+                                    $statusClass = match($payout->status) {
+                                        'success' => 'bg-emerald-100 text-emerald-700',
+                                        'failed' => 'bg-rose-100 text-rose-700',
+                                        'pending' => 'bg-amber-100 text-amber-700',
+                                        'initiated' => 'bg-sky-100 text-sky-700',
+                                        'processed' => 'bg-indigo-100 text-indigo-700',
+                                        'send_to_bank' => 'bg-violet-100 text-violet-700',
+                                        default => 'bg-slate-100 text-slate-700',
+                                    };
+                                @endphp
+                                <span class="{{ $statusClass }} px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap">
+                                    {{ ucfirst(str_replace('_', ' ', $payout->status)) }}  {{ $payout->refund && $payout->refund?->status === 'processed' ? '(Refunded)' : '' }}
+                                </span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="11" class="px-4 py-10 text-center text-slate-400">
+                                <svg class="w-10 h-10 mx-auto mb-2 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75"/>
+                                </svg>
+                                No payouts found for selected filters.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
         <div class="px-4 py-3 border-t border-gray-100">
             {{ $reports->links() }}
         </div>
     </div>
+
+    
+    <livewire:components.transfer-detail-component />
 </div>

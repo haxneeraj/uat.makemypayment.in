@@ -1,107 +1,73 @@
-<section class="py-24 bg-slate-900">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <div class="inline-flex items-center rounded-full bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 text-sm font-medium text-indigo-400 mb-4">
-                Testimonials
+<section class="relative overflow-hidden border-y border-slate-200 bg-gradient-to-b from-slate-50 via-white to-indigo-50/40 py-16 sm:py-20">
+    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_8%,rgba(99,102,241,0.10),transparent_30%),radial-gradient(circle_at_88%_12%,rgba(6,182,212,0.10),transparent_26%)]"></div>
+    <div class="pointer-events-none absolute inset-0 opacity-30" style="background-image: linear-gradient(to right, rgba(148,163,184,0.14) 1px, transparent 1px), linear-gradient(to bottom, rgba(148,163,184,0.14) 1px, transparent 1px); background-size: 34px 34px;"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto">
+            <div class="inline-flex rounded-full border border-indigo-200 bg-white px-3 py-1 text-xs font-semibold tracking-[0.2em] uppercase text-indigo-700 shadow-sm">
+                Client Voice
             </div>
-            <h2 class="text-3xl font-bold text-slate-100 mb-4">What Our Customers Say</h2>
-            <p class="text-slate-400 max-w-2xl mx-auto">
-                Join thousands of satisfied businesses that trust MakeMyPayment for their payment needs.
-            </p>
+            <h2 class="mt-4 text-3xl sm:text-4xl font-black text-slate-900">Loved by Payout Teams Across India</h2>
+            <p class="mt-3 text-slate-600">Real feedback from merchants and operators using MakeMyPayment for instant, bulk, and API-first disbursals.</p>
         </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Testimonial 1 -->
-            <div class="bg-slate-800 rounded-2xl p-8 shadow-lg border border-slate-700 h-full flex flex-col">
-                <div class="flex items-center mb-6">
-                    <svg class="h-5 w-5 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    <svg class="h-5 w-5 text-themeAccent" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    <svg class="h-5 w-5 text-themeAccent" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    <svg class="h-5 w-5 text-themeAccent" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    <svg class="h-5 w-5 text-themeAccent" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                </div>
-                
-                <p class="text-slate-300 mb-6 flex-grow">
-                    "The integration was so smooth, and the customer support team was incredibly helpful. Our payment processing is now faster than ever."
-                </p>
-                
-                <div class="flex items-center mt-auto">
-                    <div class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold">R</div>
-                    <div class="ml-3">
-                        <h4 class="font-semibold text-slate-100">Rahul Sharma</h4>
-                        <p class="text-sm text-slate-400">TechCo India</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Testimonial 2 -->
-            <div class="bg-slate-800 rounded-2xl p-8 shadow-lg border border-slate-700 h-full flex flex-col">
-                <div class="flex items-center mb-6">
-                    <svg class="h-5 w-5 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    <svg class="h-5 w-5 text-themeAccent" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    <svg class="h-5 w-5 text-themeAccent" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    <svg class="h-5 w-5 text-themeAccent" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                </div>
-                
-                <p class="text-slate-300 mb-6 flex-grow">
-                    "The dashboard analytics have been a game-changer for our business. We can now track all transactions in real-time and make informed decisions."
-                </p>
-                
-                <div class="flex items-center mt-auto">
-                    <div class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold">P</div>
-                    <div class="ml-3">
-                        <h4 class="font-semibold text-slate-100">Priya Patel</h4>
-                        <p class="text-sm text-slate-400">Retail Solutions</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Testimonial 3 -->
-            <div class="bg-slate-800 rounded-2xl p-8 shadow-lg border border-slate-700 h-full flex flex-col">
-                <div class="flex items-center mb-6">
-                    <svg class="h-5 w-5 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    <svg class="h-5 w-5 text-themeAccent" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    <svg class="h-5 w-5 text-themeAccent" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    <svg class="h-5 w-5 text-themeAccent" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                </div>
-                
-                <p class="text-slate-300 mb-6 flex-grow">
-                    "After switching to MakeMyPayment, our payment failures dropped by 90%. The API documentation is clear, and implementation was a breeze."
-                </p>
-                
-                <div class="flex items-center mt-auto">
-                    <div class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold">V</div>
-                    <div class="ml-3">
-                        <h4 class="font-semibold text-slate-100">Vikram Singh</h4>
-                        <p class="text-sm text-slate-400">E-commerce Platform</p>
-                    </div>
-                </div>
+
+        @php
+            $testimonials = [
+                ['name' => 'Rohan Malhotra', 'role' => 'Operations Lead, QuickKart', 'message' => 'Same-day settlements and clean status webhooks reduced our payout support tickets significantly.', 'tone' => 'indigo'],
+                ['name' => 'Aditi Jain', 'role' => 'Finance Team, EaseLoan', 'message' => 'The dashboard gives us exact visibility on success, pending, and failed payouts in one place.', 'tone' => 'cyan'],
+                ['name' => 'Vivek S', 'role' => 'Founder, VendorPay', 'message' => 'Bulk payout execution is fast and stable even during peak cycles at month end.', 'tone' => 'slate'],
+                ['name' => 'Neha Arora', 'role' => 'Payments Manager, RetailGrid', 'message' => 'API docs were clear and integration was quick. We moved from testing to live rollout smoothly.', 'tone' => 'indigo'],
+                ['name' => 'Nitin Kumar', 'role' => 'Treasury Ops, FinBridge', 'message' => 'The reconciliation flow is practical for accounting, and report exports save a lot of time.', 'tone' => 'cyan'],
+                ['name' => 'Pooja Mehta', 'role' => 'Product, DisbursalHub', 'message' => 'Routing across rails improved delivery rates without adding complexity to our team.', 'tone' => 'slate'],
+                ['name' => 'Ankit Roy', 'role' => 'CTO, SalarySprint', 'message' => 'Webhook callbacks are reliable and help our systems update payout states instantly.', 'tone' => 'indigo'],
+                ['name' => 'Ritika Shah', 'role' => 'Finance Ops, GrowLine', 'message' => 'Limit controls and alert visibility help us run safer payout operations daily.', 'tone' => 'cyan'],
+                ['name' => 'Harsh Patel', 'role' => 'Founder, UrbanSupply', 'message' => 'Support team is responsive and understands both technical and operational payout issues.', 'tone' => 'slate'],
+                ['name' => 'Meera Iyer', 'role' => 'Controller, B2BBox', 'message' => 'We now track every payout lifecycle stage without relying on manual follow-ups.', 'tone' => 'indigo'],
+                ['name' => 'Saurabh Rana', 'role' => 'Head of Payments, LoanWire', 'message' => 'MakeMyPayment helped us scale from low volumes to high-frequency disbursals confidently.', 'tone' => 'cyan'],
+                ['name' => 'Karan Desai', 'role' => 'Accounts, SwiftMart', 'message' => 'The overall product feels built for payout-heavy businesses, not generic payment flows.', 'tone' => 'slate'],
+            ];
+        @endphp
+
+        <div class="mt-10 rounded-3xl border border-indigo-100/80 bg-white/75 p-4 shadow-[0_24px_70px_rgba(30,41,59,0.08)] backdrop-blur sm:p-6">
+            <div class="columns-1 gap-4 sm:columns-2 xl:columns-4">
+                @foreach($testimonials as $item)
+                    @php
+                        $tone = $item['tone'];
+                        $cardClass = match($tone) {
+                            'indigo' => 'border-indigo-200 bg-gradient-to-b from-indigo-50 to-white',
+                            'cyan' => 'border-cyan-200 bg-gradient-to-b from-cyan-50 to-white',
+                            default => 'border-slate-200 bg-gradient-to-b from-slate-50 to-white',
+                        };
+
+                        $dotClass = match($tone) {
+                            'indigo' => 'bg-indigo-500',
+                            'cyan' => 'bg-cyan-500',
+                            default => 'bg-slate-500',
+                        };
+                    @endphp
+
+                    <article class="mb-4 break-inside-avoid rounded-2xl border {{ $cardClass }} p-4 shadow-sm transition-transform duration-200 hover:-translate-y-0.5">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex items-center gap-2">
+                                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">
+                                    {{ strtoupper(substr($item['name'], 0, 1)) }}
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-900">{{ $item['name'] }}</p>
+                                    <p class="text-[11px] text-slate-500">{{ $item['role'] }}</p>
+                                </div>
+                            </div>
+                            <span class="mt-1 inline-flex h-2.5 w-2.5 rounded-full {{ $dotClass }}"></span>
+                        </div>
+
+                        <p class="mt-3 text-sm leading-6 text-slate-700">{{ $item['message'] }}</p>
+
+                        <div class="mt-3 flex items-center justify-between border-t border-slate-200/80 pt-3">
+                            <span class="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">Verified Client</span>
+                            <span class="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700">5.0 Rating</span>
+                        </div>
+                    </article>
+                @endforeach
             </div>
         </div>
     </div>

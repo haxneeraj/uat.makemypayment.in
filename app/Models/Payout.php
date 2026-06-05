@@ -11,6 +11,7 @@ class Payout extends Model
         'user_id',
         'batch_id',
 
+        'merchant_reference_id',
         'transaction_id',
         'sprintnxt_txn_id',
         'sprintnxt_logger_id',
@@ -37,11 +38,18 @@ class Payout extends Model
         'fee',
         'total_amount',
 
+        'opening_balance',
+        'closing_balance',
+
         'mode',
         'status',
         'remarks',
         'purpose',
         'narration',
+
+        'raw_payload',
+
+        'initiated_from',
     ];
 
     public function user()
@@ -83,5 +91,10 @@ class Payout extends Model
         })->when(!blank($filters['status'] ?? null), function ($query) use ($filters) {
             return $query->where('status', $filters['status']);
         });
+    }
+
+    public function refund()
+    {
+        return $this->hasOne(PayoutRefund::class, 'payout_id', 'id');
     }
 }

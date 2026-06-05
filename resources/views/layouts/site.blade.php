@@ -18,13 +18,18 @@
     <meta name="twitter:title" content="{{ $metaTitle ?? 'Make My Payment - Secure Online Fintech Payment Solutions' }}">
     <meta name="twitter:description" content="{{ $metaDescription ?? 'Make My Payment offers secure, fast, and reliable fintech payment solutions for businesses and individuals. Experience seamless online transactions, bill payments, and financial services with advanced security and support.' }}">
     <meta name="twitter:image" content="{{ asset('images/og-image.png') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     @vite('resources/css/app.css')
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
 
     @livewireStyles
     @stack('styles')
 </head>
-<body class="bg-slate-950 text-slate-100 antialiased">
+<body class="bg-slate-50 text-slate-800 antialiased">
     <x-site.header />
     {{ $slot }}
     <x-site.footer />

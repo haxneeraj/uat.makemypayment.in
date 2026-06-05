@@ -50,7 +50,23 @@ return [
     |
     */
 
-    'channels' => [
+    'channels' => [    
+
+        'payout' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/payouts/payout.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => env('LOG_DAILY_DAYS', 14),
+            'replace_placeholders' => true,
+        ],    
+
+        'refund' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/refunds/refund.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => env('LOG_DAILY_DAYS', 14),
+            'replace_placeholders' => true,
+        ],
 
         'stack' => [
             'driver' => 'stack',

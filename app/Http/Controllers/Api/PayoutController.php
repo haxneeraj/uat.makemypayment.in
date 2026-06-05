@@ -65,7 +65,7 @@ class PayoutController extends Controller
      *
      * @bodyParam account_holder string required The full name of the bank account holder. Example: John Doe
      * @bodyParam account_number string required The bank account number. Example: 1234567890
-     * @bodyParam bank_name string required The name of the bank. Example: HDFC Bank
+    * @bodyParam bank_name string required The name of the bank. Special characters are not allowed. Example: HDFC Bank
      * @bodyParam ifsc_code string required The IFSC code of the bank branch. Example: HDFC0001234
      * @bodyParam amount numeric required The payout amount (must be at least 100). Example: 500
      * @bodyParam email string required The email address of the beneficiary. Example: user@example.com
@@ -144,10 +144,11 @@ class PayoutController extends Controller
 
         # Validation
         $validator = Validator::make($body_data, [
+            'merchant_reference_id' => 'required|string|max:255|unique:payouts,merchant_reference_id',
             'account_holder'      => 'required|string|max:255',
             'account_number'      => 'required|string',
             'ifsc_code'           => 'required|string',
-            'bank_name'           => 'required|string',
+            'bank_name'           => ['required', 'string', 'regex:/^[A-Za-z\s&.-]+$/'],
             'branch_name'         => 'required|string',
             'branch_code'         => 'required|string',
             'mobile'              => 'required|digits:10',
@@ -171,6 +172,7 @@ class PayoutController extends Controller
         }
 
         $payout_dto = new SinglePayoutDTO(
+            merchantReferenceId: $body_data['merchant_reference_id'],
             accountHolder:      $body_data['account_holder'],
             accountNumber:      $body_data['account_number'],
             ifscCode:           $body_data['ifsc_code'],
@@ -191,23 +193,15 @@ class PayoutController extends Controller
             type:               '1', // default to 1 for single payout
         );
 
-        $serviceResponse = app(PayoutService::class)->createSinglePayout($payout_dto, $user);
-
-        if (!is_array($serviceResponse) || !array_key_exists('status', $serviceResponse)) {
-            return $this->encryptedError($securityHelper, 'Failed to initiate payout. Please try again.', [], 500);
+        $response = app(PayoutService::class)->createSinglePayout($payout_dto, $user);
+        if($response['status'] !== 'success')
+        {
+            return $this->encryptedError($securityHelper, $response['message'] ?? 'Failed to initiate payout. Please try again.', [], 500);
         }
 
-        if (($serviceResponse['status'] ?? false) !== true) {
-            return $this->encryptedError(
-                $securityHelper,
-                (string) ($serviceResponse['message'] ?? 'Failed to initiate payout. Please try again.'),
-                (array) ($serviceResponse['data'] ?? []),
-                422
-            );
-        }
-
-        $successResponse = response()->json($serviceResponse, 200);
-        return $securityHelper->encrypt($successResponse->getContent());
+        $successResponse = $this->successResponse($response['data'] ?? [], $response['message'] ?? 'Payout initiated successfully');
+        $successJsonString = $successResponse->getContent();
+        return $securityHelper->encrypt($successJsonString);
     }
 
     /**
@@ -302,10 +296,10 @@ class PayoutController extends Controller
         $response = $this->successResponse([
             'transaction_id' => $payout->transaction_id,
             'beneficiary' => [
-                'account_holder' => $payout->payee?->account_holder,
-                'account_number' => $payout->payee?->account_number,
-                'bank_name' => $payout->payee?->bank_name,
-                'ifsc_code' => $payout->payee?->ifsc_code,
+                'account_holder' => $payout->account_holder,
+                'account_number' => $payout->account_number,
+                'bank_name' => $payout->bank_name,
+                'ifsc_code' => $payout->ifsc_code,
             ],
             'amount' => $payout->amount,
             'status' => $payout->status,
@@ -413,22 +407,9 @@ class PayoutController extends Controller
         ), $body_data['payouts']);
 
         try {
-            $serviceResponse = app(PayoutService::class)->createBulkPayout($dtos, $user);
-
-            if (!is_array($serviceResponse) || !array_key_exists('status', $serviceResponse)) {
-                return $this->encryptedError($securityHelper, 'Failed to initiate bulk payout. Please try again.', [], 500);
-            }
-
-            if (($serviceResponse['status'] ?? false) !== true) {
-                return $this->encryptedError(
-                    $securityHelper,
-                    (string) ($serviceResponse['message'] ?? 'Failed to initiate bulk payout. Please try again.'),
-                    (array) ($serviceResponse['data'] ?? []),
-                    422
-                );
-            }
-
-            return $securityHelper->encrypt(response()->json($serviceResponse, 200)->getContent());
+            $transactionIds = app(PayoutService::class)->createBulkPayout($dtos, $user);
+            $success = $this->successResponse(['transaction_ids' => $transactionIds], 'Bulk payout initiated');
+            return $securityHelper->encrypt($success->getContent());
         } catch (\Exception $e) {
             \Log::error('Bulk payout error: ' . $e->getMessage());
             return $this->encryptedError($securityHelper, 'Failed to initiate bulk payout. Please try again.', [], 500);

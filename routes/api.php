@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PayoutController;
+use App\Http\Controllers\Api\PayoutV2Controller;
 use App\Http\Controllers\Api\WebhookController;
 use App\Http\Controllers\Api\CallbackController;
 
@@ -20,4 +21,13 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('/webhook', [WebhookController::class, 'handle']);
     Route::post('/callback/springnxt-2fa', [CallbackController::class, 'springNxt2FA']);
     Route::post('/callback/sprintnxt-payout', [CallbackController::class, 'sprintnxtCallback']);
+});
+
+// API Version 2 with enhanced security and features
+Route::group(['prefix' => 'v2'], function () {
+    Route::middleware(['api.security'])->group(function () {
+        Route::prefix('payouts')->group(function () {
+            Route::post('', PayoutV2Controller::class);
+        });
+    });
 });

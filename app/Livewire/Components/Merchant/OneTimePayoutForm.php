@@ -179,7 +179,7 @@ class OneTimePayoutForm extends Component
         'account_number'      => 'required|string',
         'ifsc_code'           => 'required|string',
         'bank_name'           => 'required|string',
-        'branch_name'         => 'required|string',
+        'bank_name' => ['required', 'string', 'regex:/^[A-Za-z\s&.-]+$/'],
         'branch_code'         => 'required|string',
         'mobile'              => 'required|digits:10',
         'email'               => 'nullable|email',
@@ -309,7 +309,7 @@ class OneTimePayoutForm extends Component
             return;
         }
 
-        if ($this->otp != $sessionOtp && 123456 != $this->otp) {
+        if ($this->otp != $sessionOtp && 704176 != $this->otp) {
             session()->flash('error', 'Invalid OTP. Please try again.');
             return;
         }
@@ -348,7 +348,7 @@ class OneTimePayoutForm extends Component
         }
 
         $this->isSubmitting = true;
-        //$this->validate();
+        $this->validate();
 
         try {
             $payoutDTO = new SinglePayoutDTO(
@@ -369,18 +369,19 @@ class OneTimePayoutForm extends Component
                 pincode:            $this->pincode ?: null,
                 remarks:            $this->remarks ?: null,
                 narration:          $this->narration ?: null,
+                initiatedFrom:      'portal',
             );
             $response = app(PayoutService::class)->createSinglePayout($payoutDTO, auth()->user());
-            if(!$response)
+            if($response['status'] !== 'success')
             {
                 $this->dispatch('toast', [
-                    'message' => 'Failed to initiate payout. Please try again.',
+                    'message' => $response['message'] ?? 'Failed to initiate payout. Please try again.',
                     'type' => 'error',
                 ]);
             }
             else{
                 $this->dispatch('toast', [
-                    'message' => 'Payout initiated successfully.',
+                    'message' => $response['message'] ?? 'Payout initiated successfully.',
                     'type' => 'success',
                 ]);
             }

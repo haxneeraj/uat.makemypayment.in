@@ -60,6 +60,7 @@ class SecurityMiddleware
         }
 
         $requestIp = (string) $request->ip();
+        \Log::info("Request IP: {$requestIp}, Allowed IP: {$activation->ip}");
         if ((string) $activation->ip !== $requestIp) {
             return $this->encryptedError($securityHelper, 'Request IP is not whitelisted for this merchant.', 403);
         }

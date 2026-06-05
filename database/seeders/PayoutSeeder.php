@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Payout;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class PayoutSeeder extends Seeder
 {
@@ -15,93 +14,85 @@ class PayoutSeeder extends Seeder
      */
     public function run(): void
     {
-        $users = User::query()->pluck('id')->all();
+        $userIds = DB::table('users')->pluck('id');
 
-        if (empty($users)) {
-            $this->command?->warn('No users found. Please seed users first, then run PayoutSeeder.');
+        if ($userIds->isEmpty()) {
+            $this->command?->warn('PayoutSeeder skipped: no users found.');
+
             return;
         }
 
-        $faker = fake();
-        $startDate = Carbon::create(2026, 4, 1)->startOfDay();
-        $endDate = now()->endOfDay();
+        // Delete all existing payouts
+        Schema::disableForeignKeyConstraints();
+        DB::table('payouts')->truncate();
+        Schema::enableForeignKeyConstraints();
 
-        $cities = ['Delhi', 'Mumbai', 'Bengaluru', 'Pune', 'Chennai', 'Jaipur', 'Ahmedabad'];
-        $states = ['Delhi', 'Maharashtra', 'Karnataka', 'Rajasthan', 'Gujarat', 'Tamil Nadu'];
-        $banks = [
-            ['bank' => 'HDFC Bank', 'ifsc' => 'HDFC0000123', 'branch' => 'Karol Bagh', 'branch_code' => 'KB001'],
-            ['bank' => 'ICICI Bank', 'ifsc' => 'ICIC0000456', 'branch' => 'Andheri East', 'branch_code' => 'AE002'],
-            ['bank' => 'Axis Bank', 'ifsc' => 'UTIB0000789', 'branch' => 'Sector 18', 'branch_code' => 'S1803'],
-            ['bank' => 'State Bank of India', 'ifsc' => 'SBIN0000333', 'branch' => 'Connaught Place', 'branch_code' => 'CP004'],
-            ['bank' => 'Kotak Mahindra Bank', 'ifsc' => 'KKBK0000555', 'branch' => 'MG Road', 'branch_code' => 'MG005'],
-        ];
-        $purposes = ['Vendor Payment', 'Salary Disbursal', 'Refund', 'Commission Payout', 'Utility Settlement'];
-        $remarks = ['Priority transfer', 'Monthly cycle', 'Scheduled payout', 'Ops approved', 'As discussed'];
-        $narrations = ['Invoice settlement', 'Merchant payout', 'Business transfer', 'Wallet withdrawal', 'Partner payment'];
-        $modes = ['imps', 'neft', 'rtgs', 'a2a'];
+        $availableColumns = array_flip(Schema::getColumnListing('payouts'));
+        $fromDate = Carbon::create(2026, 2, 1, 0, 0, 0);
+        $toDate = now();
+        $rows = [];
 
-        for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
-            $transactionsPerDay = random_int(20, 30);
+        foreach ($userIds as $userId) {
+            $cursor = $fromDate->copy();
+            $baseAmount = 1000 + ($userId % 7) * 250;
 
-            for ($i = 1; $i <= $transactionsPerDay; $i++) {
-                $bank = $banks[array_rand($banks)];
-                $amount = (float) random_int(1000, 250000);
-                $fee = $amount <= 1000 ? 5.00 : round(($amount * 0.75) / 100, 2);
-                $totalAmount = round($amount + $fee, 2);
-                $status = $faker->randomElement(['initiated', 'pending', 'send_to_bank', 'success', 'failed', 'processed']);
-                $txnStatus = match ($status) {
-                    'initiated' => 0,
-                    'pending' => 2,
-                    'send_to_bank' => 3,
-                    'failed' => 4,
-                    'processed' => 6,
-                    default => 1,
-                };
+            while ($cursor->lte($toDate)) {
+                $amount = (float) $baseAmount;
+                $fee = round($amount * 0.01, 2);
+                $total = $amount + $fee;
+                $accountNumber = str_pad((string) ($userId * 17 + 1234567890), 10, '0', STR_PAD_LEFT);
+                $mobile = str_pad((string) (9000000000 + ($userId % 999999999)), 10, '0', STR_PAD_LEFT);
+                $initiatedAt = $cursor->copy()->setTime(10, 0, 0);
+                $processedAt = $cursor->copy()->setTime(10, 5, 0);
+                $stamp = $cursor->format('Ymd');
 
-                $createdAt = $date->copy()->setTime(
-                    random_int(0, 23),
-                    random_int(0, 59),
-                    random_int(0, 59)
-                );
-                $processedAt = in_array($status, ['success', 'failed', 'processed'], true)
-                    ? $createdAt->copy()->addMinutes(random_int(5, 240))
-                    : null;
+                $payload = [
+                    'user_id' => $userId,
+                    'batch_id' => null,
+                    'transaction_id' => sprintf('TXN%sU%s', $stamp, $userId),
+                    'sprintnxt_txn_id' => sprintf('SPR%sU%s', $stamp, $userId),
+                    'txn_status' => 1,
+                    'sprintnxt_logger_id' => sprintf('LOG%sU%s', $stamp, $userId),
+                    'utr' => sprintf('UTR%sU%s', $stamp, $userId),
+                    'initiated_at' => $initiatedAt,
+                    'processed_at' => $processedAt,
+                    'account_holder' => sprintf('User %s', $userId),
+                    'account_number' => $accountNumber,
+                    'ifsc_code' => 'IFSC0001234',
+                    'branch_code' => 'BR001',
+                    'bank_name' => 'Bank of Test',
+                    'branch_name' => 'Test Branch',
+                    'mobile' => $mobile,
+                    'email' => sprintf('user%s@example.com', $userId),
+                    'city' => 'Test City',
+                    'state' => 'Test State',
+                    'pincode' => '123456',
+                    'beneficiary_address' => '123 Test Street',
+                    'amount' => $amount,
+                    'fee' => $fee,
+                    'total_amount' => $total,
+                    'opening_balance' => 500000.00,
+                    'closing_balance' => 500000.00 - $total,
+                    'mode' => 'imps',
+                    'status' => 'success',
+                    'remarks' => 'Auto seeded payout',
+                    'purpose' => 'Payout seed data',
+                    'narration' => 'Daily payout seeded',
+                    'initiated_from' => 'api',
+                    'created_at' => $initiatedAt,
+                    'updated_at' => $processedAt,
+                ];
 
-                Payout::create([
-                    'user_id'             => $users[array_rand($users)],
-                    'transaction_id'      => 'TRX' . $date->format('Ymd') . strtoupper(Str::random(10)) . str_pad((string) $i, 3, '0', STR_PAD_LEFT),
-                    'account_holder'      => $faker->name(),
-                    'account_number'      => (string) random_int(1000000000, 9999999999),
-                    'ifsc_code'           => $bank['ifsc'],
-                    'branch_code'         => $bank['branch_code'],
-                    'bank_name'           => $bank['bank'],
-                    'branch_name'         => $bank['branch'],
-                    'mobile'              => '9' . (string) random_int(100000000, 999999999),
-                    'email'               => $faker->safeEmail(),
-                    'city'                => $cities[array_rand($cities)],
-                    'state'               => $states[array_rand($states)],
-                    'pincode'             => (string) random_int(100000, 999999),
-                    'beneficiary_address' => $faker->streetAddress(),
-                    'amount'              => $amount,
-                    'fee'                 => $fee,
-                    'total_amount'        => $totalAmount,
-                    'mode'                => $modes[array_rand($modes)],
-                    'status'              => $status,
-                    'purpose'             => $purposes[array_rand($purposes)],
-                    'remarks'             => $remarks[array_rand($remarks)],
-                    'narration'           => $narrations[array_rand($narrations)],
-                    'sprintnxt_txn_id'    => strtoupper(Str::random(12)),
-                    'txn_status'          => $txnStatus,
-                    'sprintnxt_logger_id' => 'LOG' . strtoupper(Str::random(8)),
-                    'utr'                 => in_array($status, ['success', 'processed'], true) ? 'UTR' . random_int(100000000000, 999999999999) : null,
-                    'initiated_at'        => $createdAt,
-                    'processed_at'        => $processedAt,
-                    'created_at'          => $createdAt,
-                    'updated_at'          => $processedAt ?? $createdAt,
-                ]);
+                $rows[] = array_intersect_key($payload, $availableColumns);
+                $cursor->addDay();
             }
         }
 
-        $this->command?->info('PayoutSeeder completed from 2026-04-01 to today with 20-30 transactions per day.');
+        foreach (array_chunk($rows, 1000) as $chunk) {
+            DB::table('payouts')->insert($chunk);
+        }
+
+        // Log command information
+        $this->command->info("PayoutSeeder executed successfully. {$userIds->count()} users ke liye Feb 1, 2026 se ab tak payouts create ho gaye.");
     }
 }

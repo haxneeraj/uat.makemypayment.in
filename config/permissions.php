@@ -25,6 +25,23 @@ return [
                 'group_name' => 'KYC Management',
             ],
 
+            // Source Account Verification Management
+            [
+                'name' => 'read-pending-source-account-verifications',
+                'label' => 'Read Pending Source Account Verifications',
+                'group_name' => 'Source Account Verification Management',
+            ],
+            [
+                'name' => 'approve-pending-source-account-verifications',
+                'label' => 'Approve Pending Source Account Verifications',
+                'group_name' => 'Source Account Verification Management',
+            ],
+            [
+                'name' => 'reject-pending-source-account-verifications',
+                'label' => 'Reject Pending Source Account Verifications',
+                'group_name' => 'Source Account Verification Management',
+            ],
+
             // IP & Webhook Verification Management
             [
                 'name' => 'read-ip-and-webhook-verifications',

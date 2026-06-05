@@ -53,9 +53,15 @@ class DashboardComponent extends Component
             'total_volume' => $totalVolume,
             'success_rate' => round($successRate, 2),
             'avg_transaction' => $avgTransaction,
+            'initiated_payouts' => Payout::where('status', 'initiated')->sum('amount'),
+            'success_payouts' => Payout::where('status', 'success')->sum('amount'),
             'total_payouts' => Payout::where('status', 'success')->sum('amount'),
             'pending_payouts' => Payout::where('status', 'pending')->sum('amount'),
+            'failed_payouts' => Payout::where('status', 'failed')->sum('amount'),
             'rejected_payouts' => Payout::where('status', 'failed')->sum('amount'),
+            'processed_payouts' => Payout::where('status', 'processed')->sum('amount'),
+            'send_to_bank_payouts' => Payout::where('status', 'send_to_bank')->sum('amount'),
+            'transaction_status_total' => Payout::whereIn('status', ['initiated', 'success', 'pending', 'failed', 'processed', 'send_to_bank'])->sum('amount'),
             'today_volume' => Payout::whereDate('created_at', $today)->sum('amount'),
             'today_success' => Payout::whereDate('created_at', $today)
                 ->where('status', 'success')
@@ -72,6 +78,7 @@ class DashboardComponent extends Component
             ->get()
             ->map(function($user) {
                 return [
+                    'id' => $user->id,
                     'name' => $user->full_name,
                     'email' => $user->email,
                     'mobile' => $user->phone,
@@ -85,21 +92,56 @@ class DashboardComponent extends Component
 
     public function getTodayPayouts()
     {
-        return Payout::with(['user'])
-            ->whereDate('created_at', Carbon::today())
-            ->latest()
-            ->get()
-            ->map(function($payout) {
-                return [
-                    'date' => $payout->created_at->format('d M,y H:i'),
-                    'amount' => '₹' . number_format($payout->amount, 2),
-                    'status' => ucfirst($payout->status),
-                    'utr' => $payout->utr,
-                    'beneficiary' => $payout->user->full_name ?? 'N/A',
-                    'merchant' => $payout->user->full_name ?? 'N/A',
-                    'mode' => $payout->mode
-                ];
-            });
+        return Payout::query()
+        ->select([
+            'id',
+            'user_id',
+            'transaction_id',
+            'utr',
+            'account_holder',
+            'account_number',
+            'bank_name',
+            'ifsc_code',
+            'amount',
+            'fee',
+            'total_amount',
+            'status',
+            'mode',
+            'initiated_at',
+            'created_at',
+        ])
+        ->with([
+            'user:id,full_name,phone',
+            'refund:id,payout_id,amount,status',
+        ])
+        ->whereBetween('created_at', [
+            now()->startOfDay(),
+            now()->endOfDay(),
+        ])
+        ->latest('id')
+        ->limit(10)
+        ->get();
+    }
+
+    public function getRecentInwardFunds()
+    {
+        return Deposit::select([
+            'id',
+            'user_id',
+            'alert_sequence_no',
+            'virtual_account',
+            'account_number',
+            'amount',
+            'transaction_description',
+            'transaction_date',
+            'mnemonic_code',
+            'processing_status',
+            'created_at',
+        ])
+        ->with(['user:id,full_name,phone'])
+        ->latest()
+        ->take(10)
+        ->get();
     }
 
     protected function getFormattedStatus($user)
@@ -145,6 +187,7 @@ class DashboardComponent extends Component
             'businessAnalytics' => $this->getBusinessAnalytics(),
             'todayMerchants' => $this->getTodayMerchants(),
             'todayPayouts' => $this->getTodayPayouts(),
+            'recentInwardFunds' => $this->getRecentInwardFunds(),
             'topPerformers' => $this->getTopPerformers(),
         ])
         ->layout('layouts.admin')

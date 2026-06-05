@@ -26,7 +26,17 @@ class AdminBalanceComponent extends Component
         try {
             $payoutService = app(PayoutService::class);
             $response = $payoutService->getAccountBalance();
-            $this->balance = $response['availableBalance'] ?? 0;
+            if ($response['status'] !== 'success' && (!isset($response['data']) || !is_array($response['data']) || !isset($response['data']['availableBalance']))) {
+                $this->balance = 0;
+                $this->balanceVisible = false;
+                $this->dispatch('toast', [
+                    'message' => $response['message'] ?? 'Failed to fetch balance. Please try again later.',
+                    'type' => 'error',
+                ]);
+                return;
+            }
+
+            $this->balance = $response['data']['availableBalance'] ?? 0;
             $this->balanceVisible = true;
         } catch (\Exception $e) {
             $this->balance = 0;

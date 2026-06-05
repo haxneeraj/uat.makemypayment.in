@@ -64,7 +64,8 @@ class AuthTokenGenerator
             'encryptedRequest' => $encryptedRequest,
         ]);
 
-        $response = Http::withHeaders([            
+        $response = Http::timeout(120)
+        ->withHeaders([            
             'User-Agent' => 'NXT728453-Snxt-Payments',
             'client-id' => env('SPRINTNXT_CLIENT_ID'),
             'partnerId' => env('SPRINTNXT_PARTNER_ID'),

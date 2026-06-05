@@ -123,17 +123,6 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M16 3v4M8 3v4" stroke="currentColor" stroke-width="2"/></svg>
                         Organization
                     </a>
-
-                    <!-- API Docs moved here -->
-                    <br />
-                    <div class="mt-6 mb-2 text-xs text-gray-400 font-semibold px-3">Developer Tools</div>
-                    <a target="_blank" href="https://developer.makemypayment.in" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium text-gray-900 {{ $active == 'API' ? 'bg-appPrimary text-white' : 'hover:bg-appPrimary hover:text-white' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
-                            <path d="M8 8h8M8 12h8M8 16h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                        API Docs
-                    </a>
                 </nav>
 
                 <br />

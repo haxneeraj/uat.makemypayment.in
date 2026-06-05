@@ -28,19 +28,6 @@
             <div class="bg-white rounded-lg shadow">
                 <div class="p-6">
                     <h2 class="text-lg font-semibold text-gray-900 mb-6">Change Password</h2>
-                    {{-- Success Message --}}
-                    @if(Session::has('success'))
-                        <div class="mb-4 p-4 rounded-lg bg-green-100 text-green-800">
-                            {{ Session::get('success') }}
-                        </div>
-                    @endif
-
-                    {{-- Error Message --}}
-                    @if(Session::has('error'))
-                        <div class="mb-4 p-4 rounded-lg bg-red-100 text-red-800">
-                            {{ Session::get('error') }}
-                        </div>
-                    @endif
 
                     {{-- Change Password Form --}}
                     <div class="rounded-md bg-yellow-50 p-4">
@@ -109,18 +96,6 @@
             <div class="bg-white rounded-lg shadow">
                 <div class="p-6">
                     <h2 class="text-lg font-semibold text-gray-900 mb-6">IP and Webhook Configuration</h2>
-                    
-                    @if(session('success'))
-                        <div class="mb-4 p-4 rounded-lg bg-green-50 text-green-700">
-                            {{ session('success') }}
-                        </div>
-                    @endif
-
-                    @if(session('error'))
-                        <div class="mb-4 p-4 rounded-lg bg-red-50 text-red-700">
-                            {{ session('error') }}
-                        </div>
-                    @endif
 
                     @if(!$kyc_status)
                         <div class="rounded-md bg-yellow-50 p-4">
@@ -203,7 +178,10 @@
                                     wire:target="saveWebhookSettings"
                                     wire:loading.attr="disabled"
                                     wire:loading.class="opacity-50 cursor-not-allowed"
-                                    class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-appPrimary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    class="inline-flex items-center justify-center gap-1.5 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-appPrimary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                    </svg>
                                     Save Changes
                                 </button>
                             </div>
@@ -257,7 +235,11 @@
                                     <input type="text" readonly value="{{ $api_key }}" id="apiKeyInput"
                                         class="flex-1 block w-full rounded-md border-gray-300 bg-gray-50">
                                     <button type="button" onclick="copyToClipboard('apiKeyInput', this)" 
-                                        class="ml-2 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                        class="ml-2 inline-flex items-center gap-1.5 px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                                        </svg>
                                         <span>Copy</span>
                                     </button>
                                 </div>
@@ -269,7 +251,11 @@
                                     <input type="text" readonly value="{{ $api_secret }}" id="apiSecretInput"
                                         class="flex-1 block w-full rounded-md border-gray-300 bg-gray-50">
                                     <button type="button" onclick="copyToClipboard('apiSecretInput', this)"
-                                        class="ml-2 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                        class="ml-2 inline-flex items-center gap-1.5 px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                                        </svg>
                                         <span>Copy</span>
                                     </button>
                                 </div>
@@ -281,7 +267,10 @@
                                     wire:target="generateAPICredentials"
                                     wire:loading.attr="disabled"
                                     wire:loading.class="opacity-50 cursor-not-allowed"
-                                    class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-appPrimary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    class="inline-flex items-center justify-center gap-1.5 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-appPrimary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m14.836 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0A8.003 8.003 0 015.17 15m13.248 0H15"/>
+                                    </svg>
                                     Regenerate Credentials
                                 </button>
                             </div>
@@ -301,11 +290,17 @@
             <p class="text-sm text-gray-600 mb-6">Your IP and Webhook settings are currently verified. Updating them will require re-verification from admin. During this time, your current API will stop working and no transactions will be processed until admin approval. Do you want to continue?</p>
             
             <div class="flex justify-end gap-3">
-                <button wire:click="$set('showConfirmModal', false)" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700">
+                <button wire:click="$set('showConfirmModal', false)" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
                     Cancel
                 </button>
-                <button wire:click="saveWebhookSettings" class="px-4 py-2 text-sm font-medium text-white bg-appPrimary rounded-md hover:bg-blue-700">
-                    Update Settings
+                <button wire:click="saveWebhookSettings" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-appPrimary rounded-md hover:bg-blue-700">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Send OTP & Continue
                 </button>
             </div>
         </div>
@@ -317,15 +312,110 @@
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75">
         <div class="bg-red-100 rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Confirm Regenerate API Credentials</h3>
-            <p class="text-sm text-gray-600 mb-6">Your current API credentials will be regenerated. Do you want to continue?</p>
+            <p class="text-sm text-gray-600 mb-6">Your current API credentials will be regenerated. OTP verification is required to continue.</p>
 
             <div class="flex justify-end gap-3">
-                <button wire:click="$set('showAPIpopup', false)" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700">
+                <button wire:click="$set('showAPIpopup', false)" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
                     Cancel
                 </button>
-                <button wire:click="generateAPICredentials" class="px-4 py-2 text-sm font-medium text-white bg-appPrimary rounded-md hover:bg-blue-700">
-                    Regenerate Credentials
+                <button wire:click="generateAPICredentials" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-appPrimary rounded-md hover:bg-blue-700">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Send OTP & Continue
                 </button>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- OTP Verification Modal -->
+    @if($showOTPModal)
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 px-4" x-data="{
+        resendTimer: @entangle('resendTimer'),
+        resendInterval: null,
+        startTimer() {
+            if (this.resendInterval) clearInterval(this.resendInterval);
+            if (this.resendTimer > 0) {
+                this.resendInterval = setInterval(() => {
+                    if (this.resendTimer > 0) this.resendTimer--;
+                    if (this.resendTimer <= 0 && this.resendInterval) {
+                        clearInterval(this.resendInterval);
+                        this.resendInterval = null;
+                    }
+                }, 1000);
+            }
+        }
+    }" x-init="startTimer(); $watch('resendTimer', (value) => {
+        if (value > 0 && !resendInterval) startTimer();
+        if (value <= 0 && resendInterval) {
+            clearInterval(resendInterval);
+            resendInterval = null;
+        }
+    })">
+        <div class="w-full max-w-md overflow-hidden rounded-2xl border border-indigo-100 bg-white shadow-[0_24px_70px_rgba(15,23,42,0.20)]">
+            <div class="bg-gradient-to-r from-indigo-600 to-cyan-600 px-6 py-4 text-white">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 11V7m0 0l-3 3m3-3l3 3m6 3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold leading-tight">OTP Verification</h3>
+                        <p class="text-xs text-indigo-100">Enter your secure 6-digit code</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <p class="mb-4 text-sm text-slate-600">We have sent an OTP to your registered mobile number. Verify to continue this sensitive action.</p>
+
+                <div>
+                    <label for="otp" class="block text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">One-Time Password</label>
+                    <input
+                        type="text"
+                        id="otp"
+                        wire:model.defer="otp"
+                        maxlength="6"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                        class="mt-2 block w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-center text-2xl font-black tracking-[0.35em] text-slate-900 placeholder:tracking-normal placeholder:font-medium placeholder:text-sm placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                        placeholder="000000"
+                    >
+                    @error('otp') <span class="mt-1 block text-xs text-red-500">{{ $message }}</span> @enderror
+                </div>
+
+                <div class="mt-4 flex items-center justify-between rounded-xl border border-indigo-100 bg-indigo-50 px-3 py-2">
+                    <span class="text-xs font-medium text-indigo-700">Did not receive OTP?</span>
+                    <template x-if="resendTimer > 0">
+                        <span class="text-xs font-semibold text-indigo-700">Resend in <span x-text="resendTimer"></span>s</span>
+                    </template>
+                    <template x-if="resendTimer <= 0">
+                        <button type="button" wire:click="resendActionOtp" class="text-xs font-semibold text-indigo-700 hover:text-indigo-900">
+                            Resend OTP
+                        </button>
+                    </template>
+                </div>
+
+                <div class="mt-6 flex flex-wrap justify-end gap-2">
+                    <button wire:click="cancelOtpVerification" class="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        Cancel
+                    </button>
+                    <button wire:click="verifyActionOtp" class="inline-flex items-center gap-1.5 rounded-lg bg-appPrimary px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Verify & Continue
+                    </button>
+                </div>
             </div>
         </div>
     </div>

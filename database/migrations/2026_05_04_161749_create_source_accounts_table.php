@@ -18,8 +18,11 @@ return new class extends Migration
             $table->string('ifsc_code');
             $table->string('account_holder_name');
             $table->string('bank_name');
+            $table->string('document_type');
             $table->boolean('is_primary')->default(false);
-            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->string('remarks')->nullable();
+            $table->string('document')->nullable(); // to store document path if needed
+            $table->enum('status', ['active', 'inactive'])->default('active'); // active mean approved by admin, inactive means pending or rejected
             $table->timestamps();
         });
     }

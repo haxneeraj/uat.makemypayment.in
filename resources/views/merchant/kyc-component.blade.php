@@ -452,7 +452,7 @@
                             @include('merchant.kyc._file-uploader', [
                                 'wireModel'   => 'cin_front',
                                 'xRef'        => 'cin_front_input',
-                                'label'       => 'CIN Document',
+                                'label'       => 'Board Resolution',
                                 'required'    => !$cin_front_url,
                                 'existingUrl' => $cin_front_url,
                                 'errorKey'    => 'cin_front',
@@ -535,6 +535,7 @@
                             'required'    => !$document_aoa_url,
                             'existingUrl' => $document_aoa_url,
                             'errorKey'    => 'document_aoa',
+                            'fileSize'    => 12288,
                         ])
 
                         @include('merchant.kyc._file-uploader', [

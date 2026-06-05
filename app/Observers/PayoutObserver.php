@@ -23,6 +23,7 @@ class PayoutObserver
     {
         // Only if status change then dispatch webhook
         if ($payout->isDirty('status')) {
+            // Dispatch webhook to notify user about payout status change
             SendPayoutWebhookJob::dispatch(
                 $payout->user_id,
                 [

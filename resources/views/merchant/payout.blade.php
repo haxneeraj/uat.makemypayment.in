@@ -288,22 +288,39 @@
             <table class="min-w-full text-sm">
                 <thead>
                     <tr class="bg-white text-left">
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">#</th>
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Initiated At</th>
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Transaction ID</th>
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Reference ID</th>
                         <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Beneficiary</th>
                         <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Bank Details</th>
                         <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Mobile</th>
                         <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">UTR Number</th>
-                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Transfer ID</th>
                         <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Amount</th>
                         <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Fee</th>
                         <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Total Amount</th>
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Opening Balance</th>
+                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Closing Balance</th>
                         <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Mode</th>
-                        <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Initiated At</th>
                         <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Status</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     @forelse($payouts as $payout)
                     <tr class="hover:bg-white/90 transition">
+                        <td class="px-4 py-3 font-mono text-xs text-slate-400 whitespace-nowrap">{{ $loop->iteration }}</td>
+                        <td class="px-4 py-3 text-slate-600 whitespace-nowrap text-xs">
+                            {{ \Carbon\Carbon::parse($payout->initiated_at)->format('d M Y, h:i A') }}
+                            @if($payout->processed_at)
+                                <div class="text-slate-400 mt-0.5">Done: {{ \Carbon\Carbon::parse($payout->processed_at)->format('d M Y, h:i A') }}</div>
+                            @endif
+                        </td>
+                        
+                        <td class="px-4 py-3 cursor-pointer text-indigo-600 whitespace-nowrap font-mono text-xs font-semibold hover:underline"
+                            wire:click="$dispatch('openTransferDetailModal', { transferId: '{{ $payout->transaction_id }}' })">
+                            {{ $payout->transaction_id }}
+                        </td>
+                        <td class="px-4 py-3 text-indigo-600 whitespace-nowrap font-mono text-xs font-semibold">{{ $payout->merchant_reference_id ?? 'N/A' }}</td>
                         <td class="px-4 py-3 text-slate-700 whitespace-nowrap">
                             <div class="font-medium text-slate-900">{{ $payout->account_holder }}</div>
                             <div class="text-xs text-slate-400 mt-0.5">{{ $payout->account_number }}</div>
@@ -320,21 +337,13 @@
                                 <span class="text-slate-400 text-xs">N/A</span>
                             @endif
                         </td>
-                        <td class="px-4 py-3 cursor-pointer text-indigo-600 whitespace-nowrap font-mono text-xs font-semibold"
-                            wire:click="$dispatch('openTransferDetailModal', { transferId: '{{ $payout->transaction_id }}' })">
-                            {{ $payout->transaction_id }}
-                        </td>
                         <td class="px-4 py-3 font-semibold text-slate-900 whitespace-nowrap">₹{{ number_format($payout->amount, 2) }}</td>
                         <td class="px-4 py-3 text-slate-700 whitespace-nowrap">₹{{ number_format($payout->fee ?? 0, 2) }}</td>
                         <td class="px-4 py-3 font-semibold text-slate-900 whitespace-nowrap">₹{{ number_format($payout->total_amount ?? ($payout->amount + ($payout->fee ?? 0)), 2) }}</td>
+                        <td class="px-4 py-3 text-slate-700 whitespace-nowrap">₹{{ number_format($payout->opening_balance ?? 0, 2) }}</td>
+                        <td class="px-4 py-3 font-semibold text-slate-900 whitespace-nowrap">₹{{ number_format($payout->closing_balance ?? 0, 2) }}</td>
                         <td class="px-4 py-3 whitespace-nowrap">
                             <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-semibold uppercase">{{ $payout->mode }}</span>
-                        </td>
-                        <td class="px-4 py-3 text-slate-600 whitespace-nowrap text-xs">
-                            {{ \Carbon\Carbon::parse($payout->initiated_at)->format('d M Y, h:i A') }}
-                            @if($payout->processed_at)
-                                <div class="text-slate-400 mt-0.5">Done: {{ \Carbon\Carbon::parse($payout->processed_at)->format('d M Y, h:i A') }}</div>
-                            @endif
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap">
                             @php
@@ -349,7 +358,7 @@
                                 };
                             @endphp
                             <span class="{{ $statusClass }} px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap">
-                                {{ ucfirst(str_replace('_', ' ', $payout->status)) }}
+                                {{ ucfirst(str_replace('_', ' ', $payout->status)) }} {{ $payout->refund && $payout->refund?->status === 'processed' ? '(Refunded)' : '' }}
                             </span>
                         </td>
                     </tr>

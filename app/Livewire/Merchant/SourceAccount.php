@@ -2,11 +2,18 @@
 
 namespace App\Livewire\Merchant;
 
+use App\Services\SMSService;
 use Livewire\Component;
 use App\Models\SourceAccount as SourceAccountModel;
+use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class SourceAccount extends Component
 {
+    use WithFileUploads;
+
     public $showAddModal      = false;
     public $showKycBlockModal = false;
     public $deleteConfirmId   = null;
@@ -15,6 +22,18 @@ class SourceAccount extends Component
     public $ifsc_code;
     public $account_holder_name;
     public $bank_name;
+    public $document_type;
+    public $document_file;
+    public $showOTPModal = false;
+    public $otp;
+    public $otpAction;
+    public $resendTimer = 0;
+
+    protected $otpSessionKey = 'source_account_action_otp';
+    protected $otpActionKey = 'source_account_action_otp_action';
+    protected $otpUserIdKey = 'source_account_action_otp_user_id';
+    protected $otpPayloadKey = 'source_account_action_otp_payload';
+    protected $resendWait = 90;
 
     protected function rules(): array
     {
@@ -23,6 +42,8 @@ class SourceAccount extends Component
             'ifsc_code'           => 'required|string|regex:/^[A-Z]{4}0[A-Z0-9]{6}$/i',
             'account_holder_name' => 'required|string|max:100',
             'bank_name'           => 'required|string|max:100',
+            'document_type'       => 'required|in:statement,cancel_cheque',
+            'document_file'       => 'required|file|mimes:pdf,jpg,jpeg,png|max:12288',
         ];
     }
 
@@ -41,7 +62,7 @@ class SourceAccount extends Component
         }
 
         if ($merchant->merchantSourceAccounts()->count() >= $merchant->max_source_accounts) {
-            session()->flash('error', "You have reached the maximum limit of {$merchant->max_source_accounts} source accounts.");
+            $this->dispatch('toast', type: 'error', message: "You have reached the maximum limit of {$merchant->max_source_accounts} source accounts.");
             return;
         }
 
@@ -72,22 +93,27 @@ class SourceAccount extends Component
         }
 
         if ($merchant->merchantSourceAccounts()->count() >= $merchant->max_source_accounts) {
-            $this->addError('account_number', "You have reached the maximum limit of {$merchant->max_source_accounts} source accounts.");
+            $this->dispatch('toast', type: 'error', message: "You have reached the maximum limit of {$merchant->max_source_accounts} source accounts.");
             return;
         }
 
         $this->validate();
 
-        $merchant->merchantSourceAccounts()->create([
+        if (blank($merchant->phone)) {
+            $this->dispatch('toast', type: 'error', message: 'Unable to send OTP. Please update your registered mobile number.');
+            return;
+        }
+
+        $documentPath = $this->document_file->store('source-accounts/pending', 'public');
+
+        $this->sendActionOtp('create', [
             'account_number'      => $this->account_number,
             'ifsc_code'           => strtoupper($this->ifsc_code),
             'account_holder_name' => $this->account_holder_name,
             'bank_name'           => $this->bank_name,
+            'document_type'       => $this->document_type,
+            'document_path'       => $documentPath,
         ]);
-
-        $this->showAddModal = false;
-        $this->resetFields();
-        session()->flash('success', 'Source account added successfully.');
     }
 
     public function confirmDelete(int $id): void
@@ -95,11 +121,34 @@ class SourceAccount extends Component
         $account = SourceAccountModel::where('user_id', auth()->id())->findOrFail($id);
 
         if ($account->is_primary) {
-            session()->flash('error', 'Primary account cannot be deleted.');
+            $this->dispatch('toast', type: 'error', message: 'Primary account cannot be deleted.');
             return;
         }
 
         $this->deleteConfirmId = $id;
+    }
+
+    public function requestDeleteOtp(int $id): void
+    {
+        $merchant = auth()->user();
+
+        if (blank($merchant->phone)) {
+            $this->dispatch('toast', type: 'error', message: 'Unable to send OTP. Please update your registered mobile number.');
+            return;
+        }
+
+        $account = SourceAccountModel::where('user_id', auth()->id())->findOrFail($id);
+
+        if ($account->is_primary) {
+            $this->dispatch('toast', type: 'error', message: 'Primary account cannot be deleted.');
+            return;
+        }
+
+        $this->sendActionOtp('delete', [
+            'account_id' => $account->id,
+        ]);
+
+        $this->deleteConfirmId = null;
     }
 
     public function cancelDelete(): void
@@ -112,14 +161,183 @@ class SourceAccount extends Component
         $account = SourceAccountModel::where('user_id', auth()->id())->findOrFail($id);
 
         if ($account->is_primary) {
-            session()->flash('error', 'Primary account cannot be deleted.');
+            $this->dispatch('toast', type: 'error', message: 'Primary account cannot be deleted.');
             $this->deleteConfirmId = null;
             return;
         }
 
         $account->delete();
         $this->deleteConfirmId = null;
-        session()->flash('success', 'Source account removed successfully.');
+        $this->dispatch('toast', type: 'success', message: 'Source account removed successfully.');
+    }
+
+    public function verifyActionOtp(): void
+    {
+        $this->validate([
+            'otp' => ['required', 'digits:6'],
+        ]);
+
+        $sessionOtp = Session::get($this->otpSessionKey);
+        $action = Session::get($this->otpActionKey);
+        $userId = Session::get($this->otpUserIdKey);
+        $payload = Session::get($this->otpPayloadKey, []);
+
+        if (!$sessionOtp || !$action || !$userId || (int) $userId !== (int) auth()->id()) {
+            $this->closeOtpModal();
+            $this->forgetOtpSession();
+
+            throw ValidationException::withMessages([
+                'otp' => 'OTP expired or invalid. Please try again.',
+            ]);
+        }
+
+        if ((string) $this->otp !== (string) $sessionOtp) {
+            throw ValidationException::withMessages([
+                'otp' => 'Invalid OTP. Please try again.',
+            ]);
+        }
+
+        if ($action === 'create') {
+            $this->createAccountAfterOtp(is_array($payload) ? $payload : []);
+        }
+
+        if ($action === 'delete') {
+            $this->deleteAccountAfterOtp(is_array($payload) ? $payload : []);
+        }
+
+        $this->forgetOtpSession();
+        $this->closeOtpModal();
+        $this->otp = null;
+        $this->otpAction = null;
+        $this->resendTimer = 0;
+    }
+
+    public function resendActionOtp(): void
+    {
+        if ((int) $this->resendTimer > 0) {
+            return;
+        }
+
+        $action = Session::get($this->otpActionKey);
+        if (!in_array($action, ['create', 'delete'], true)) {
+            return;
+        }
+
+        $payload = Session::get($this->otpPayloadKey, []);
+        $this->sendActionOtp($action, is_array($payload) ? $payload : []);
+    }
+
+    public function cancelOtpVerification(): void
+    {
+        $action = Session::get($this->otpActionKey, $this->otpAction);
+        $payload = Session::get($this->otpPayloadKey, []);
+
+        if ($action === 'create' && is_array($payload) && !empty($payload['document_path'])) {
+            Storage::disk('public')->delete($payload['document_path']);
+        }
+
+        $this->forgetOtpSession();
+        $this->closeOtpModal();
+        $this->otp = null;
+        $this->otpAction = null;
+        $this->resendTimer = 0;
+        $this->deleteConfirmId = null;
+        $this->showAddModal = $action === 'create';
+    }
+
+    private function sendActionOtp(string $action, array $payload = []): void
+    {
+        $merchant = auth()->user();
+        $mobile = $merchant->phone ?? null;
+
+        if (blank($mobile)) {
+            if ($action === 'create' && !empty($payload['document_path'])) {
+                Storage::disk('public')->delete($payload['document_path']);
+            }
+
+            $this->dispatch('toast', type: 'error', message: 'Unable to send OTP. Please update your registered mobile number.');
+            return;
+        }
+
+        $otp = random_int(100000, 999999);
+
+        Session::put($this->otpSessionKey, (string) $otp);
+        Session::put($this->otpActionKey, $action);
+        Session::put($this->otpUserIdKey, $merchant->id);
+        Session::put($this->otpPayloadKey, $payload);
+
+        $sent = app(SMSService::class)->sendSMS($mobile, $otp);
+        if ($sent === false) {
+            if ($action === 'create' && !empty($payload['document_path'])) {
+                Storage::disk('public')->delete($payload['document_path']);
+            }
+
+            $this->forgetOtpSession();
+            $this->dispatch('toast', type: 'error', message: 'Unable to send OTP right now. Please try again.');
+            return;
+        }
+
+        $this->otpAction = $action;
+        $this->showAddModal = false;
+        $this->showOTPModal = true;
+        $this->otp = null;
+        $this->resendTimer = $this->resendWait;
+        $this->resetErrorBag('otp');
+
+        if ($action === 'delete') {
+            $this->deleteConfirmId = null;
+        }
+
+        $this->dispatch('toast', type: 'success', message: 'OTP sent successfully. Please verify to continue.');
+    }
+
+    private function createAccountAfterOtp(array $payload): void
+    {
+        if (empty($payload)) {
+            $this->dispatch('toast', type: 'error', message: 'Source account details not found. Please try again.');
+            return;
+        }
+
+        $merchant = auth()->user();
+
+        $merchant->merchantSourceAccounts()->create([
+            'account_number'      => $payload['account_number'] ?? null,
+            'ifsc_code'           => $payload['ifsc_code'] ?? null,
+            'account_holder_name' => $payload['account_holder_name'] ?? null,
+            'bank_name'           => $payload['bank_name'] ?? null,
+            'document_type'       => $payload['document_type'] ?? null,
+            'document'            => $payload['document_path'] ?? null,
+            'status'              => 'inactive',
+        ]);
+
+        $this->showAddModal = false;
+        $this->resetFields();
+        $this->dispatch('toast', type: 'success', message: 'Source account submitted successfully and is now inactive pending review.');
+    }
+
+    private function deleteAccountAfterOtp(array $payload): void
+    {
+        $accountId = $payload['account_id'] ?? null;
+
+        if (blank($accountId)) {
+            $this->dispatch('toast', type: 'error', message: 'Source account not found. Please try again.');
+            return;
+        }
+
+        $this->deleteAccount((int) $accountId);
+    }
+
+    private function forgetOtpSession(): void
+    {
+        Session::forget($this->otpSessionKey);
+        Session::forget($this->otpActionKey);
+        Session::forget($this->otpUserIdKey);
+        Session::forget($this->otpPayloadKey);
+    }
+
+    private function closeOtpModal(): void
+    {
+        $this->showOTPModal = false;
     }
 
     private function resetFields(): void
@@ -128,6 +346,8 @@ class SourceAccount extends Component
         $this->ifsc_code           = '';
         $this->account_holder_name = '';
         $this->bank_name           = '';
+        $this->document_type       = '';
+        $this->document_file       = null;
     }
 
     public function render()
