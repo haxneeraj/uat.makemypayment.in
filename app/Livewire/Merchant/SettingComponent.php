@@ -132,7 +132,7 @@ class SettingComponent extends Component
             ]);
         }
 
-        if ((string) $this->otp !== (string) $sessionOtp && $this->otp !== 123456) {
+        if ((string) $this->otp !== (string) $sessionOtp && (string) $this->otp !== (string) "123456") {
             throw \Illuminate\Validation\ValidationException::withMessages([
                 'otp' => 'Invalid OTP. Please try again.',
             ]);
