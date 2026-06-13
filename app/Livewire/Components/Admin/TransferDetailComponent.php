@@ -77,6 +77,7 @@ class TransferDetailComponent extends Component
                 $this->payout->user_id,
                 [
                     'transaction_id' => $this->payout->transaction_id,
+                    'merchant_reference_id' => $this->payout->merchant_reference_id,
                     'beneficiary_account_holder' => $this->payout->account_holder,
                     'beneficiary_account_number' => $this->payout->account_number,
                     'beneficiary_bank_name' => $this->payout->bank_name,

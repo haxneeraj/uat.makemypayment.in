@@ -28,6 +28,7 @@ class PayoutObserver
                 $payout->user_id,
                 [
                     'transaction_id' => $payout->transaction_id,
+                    'merchant_reference_id' => $payout->merchant_reference_id,
                     'beneficiary_account_holder' => $payout->payee?->account_holder,
                     'beneficiary_account_number' => $payout->payee?->account_number,
                     'beneficiary_bank_name' => $payout->payee?->bank_name,
